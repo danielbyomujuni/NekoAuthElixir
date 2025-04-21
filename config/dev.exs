@@ -2,9 +2,11 @@ import Config
 
 # Configure your database
 config :neko_auth, NekoAuth.Repo,
-  username: "elixir",
-  password: "password",
-  hostname: "192.168.1.76",
+  #username: "elixir",
+  username: "danielbyomujuni",
+  #password: "password",
+  #hostname: "192.168.1.76",
+  hostname: "localhost",
   database: "elixir_auth",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

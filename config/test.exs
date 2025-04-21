@@ -6,9 +6,11 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :neko_auth, NekoAuth.Repo,
-  username: "elixir",
-  password: "password",
-  hostname: "192.168.1.76",
+    #username: "elixir",
+    username: "danielbyomujuni",
+    #password: "password",
+    #hostname: "192.168.1.76",
+    hostname: "localhost",
   database: "elixir_auth_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2

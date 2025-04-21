@@ -24,6 +24,7 @@ defmodule NekoAuthWeb.Router do
   scope "/api/v1", NekoAuthWeb do
     pipe_through :api
     get "/oauth/authorize", OAuthController, :authorize
+    post "/register", UserController, :register
   end
 
 

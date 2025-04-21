@@ -3,9 +3,46 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
 import { useSearchParams } from 'react-router-dom';
+import { toast } from "sonner";
 
 export default function Register() {
     const [searchParams] = useSearchParams();
+
+    const [email, setEmail] = React.useState("");
+    const [username, setUsername] = React.useState("");
+    const [display_name, setDisplayName] = React.useState("");
+    const [password, setPassword] = React.useState("");
+    const [password_confirmation, setPasswordConfirmation] = React.useState("");
+    const [date_of_birth, setDateOfBirth] = React.useState("");
+
+    const handleSubmit = async () => {
+      console.log(JSON.stringify({
+        email,
+        display_name,
+        user_name: username,
+        password,
+        password_confirmation,
+        date_of_birth,
+      }))
+
+        const res = await fetch("/api/v1/register", {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            display_name,
+            user_name: username,
+            password,
+            password_confirmation,
+            date_of_birth,
+          }),
+        });
+    
+        if (res.status !== 200) {
+          toast((await res.json()).value);
+        }
+      };
+    
+  
 
   return (
     <>
@@ -19,7 +56,7 @@ export default function Register() {
               type="email"
               placeholder="d@nekosyndicate.com"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setEmail(e.target.value);}}
               required
             />
           </div>
@@ -29,7 +66,7 @@ export default function Register() {
               id="date_of_birth"
               type="date"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setDateOfBirth(e.target.value);}}
               required
             />
           </div>
@@ -39,7 +76,7 @@ export default function Register() {
               id="username"
               type="text"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setUsername(e.target.value)}}
               required
             />
           </div>
@@ -49,7 +86,7 @@ export default function Register() {
               id="display_name"
               type="text"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setDisplayName(e.target.value)}}
               required
             />
           </div>
@@ -60,7 +97,7 @@ export default function Register() {
               id="password"
               type="password"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setPassword(e.target.value)}}
               required
             />
           </div>
@@ -70,13 +107,13 @@ export default function Register() {
               id="password_confirmation"
               type="password"
               className={false ? "text-destructive border-destructive focus:border-destructive focus-visible:ring-destructive" : ""}
-              onChange={(e) => {}}
+              onChange={(e) => {setPasswordConfirmation(e.target.value)}}
               required
             />
           </div>
         </div>
 
-        <Button className="w-full mt-4" onClick={() => {}}>
+        <Button className="w-full mt-4" onClick={() => {handleSubmit()}}>
           Register
         </Button>
 

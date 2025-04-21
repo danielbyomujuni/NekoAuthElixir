@@ -55,6 +55,7 @@ defmodule NekoAuth.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:bcrypt_elixir, "~> 3.0"},
 
       # App libs
       {:absinthe, "~> 1.7"},
@@ -76,7 +77,8 @@ defmodule NekoAuth.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       coverage: ["test --cover"],
       "assets.install": ["cmd (cd assets && yarn install)"],
-      "assets.tsc": ["cmd (cd assets && yarn run tsc)"]
+      "assets.tsc": ["cmd (cd assets && yarn run tsc)"],
+      run: ["cmd export $(cat .env | xargs) && mix phx.server"]
     ]
   end
 end
