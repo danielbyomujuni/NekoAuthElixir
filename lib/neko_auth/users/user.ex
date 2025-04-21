@@ -2,9 +2,8 @@ defmodule NekoAuth.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key false
+  @primary_key {:email, :string, []}
   schema "user" do
-    field :email, :string
     field :display_name, :string
     field :user_name, :string
     field :descriminator, :integer
@@ -16,7 +15,7 @@ defmodule NekoAuth.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified])
-    |> validate_required([:email, :display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified])
+    |> cast(attrs, [:display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified])
+    |> validate_required([:display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified])
   end
 end

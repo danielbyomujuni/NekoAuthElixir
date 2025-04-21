@@ -97,7 +97,6 @@ defmodule NekoAuth.Domains.UserDomain do
   def get_user_by_email(email) do
     user =
       Repo.get(User, email)
-      |> Repo.preload(:sessions)
 
     case user do
       nil -> Result.err("User not found")

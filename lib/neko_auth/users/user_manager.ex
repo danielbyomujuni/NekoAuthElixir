@@ -8,6 +8,14 @@ defmodule NekoAuth.User.UserManager do
   alias NekoAuth.Repo
   alias Result
   alias RegistrationStruct
+  alias Joken.Signer
+
+  @access_token_ttl 15 * 60        # 15 minutes
+  @refresh_token_ttl 60 * 60 * 24  # 1 day
+  @issuer "neko_auth"
+
+  defp signer, do: TokenSigner.load_private_key()
+
 
   @doc """
   Registers a new user from validated registration data.
@@ -41,4 +49,60 @@ defmodule NekoAuth.User.UserManager do
       _ -> Result.err("Unexpected Error")
     end
   end
+
+  @doc """
+  Authenticates a user using email and password.
+
+  Returns `{:ok, %User{}}` or `{:error, reason}`.
+  """
+  def user_from_login(email, password) do
+    with {:ok, user} <- UserDomain.get_user_by_email(email),
+         true <- UserDomain.password_matches?(user.password_hash, password) do
+      Result.from(user)
+    else
+      {:error, _} -> Result.err("User not found")
+      false -> Result.err("Invalid password")
+    end
+  end
+
+  def create_access_token(%User{} = user) do
+    claims = %{
+      "sub" => user.email,
+      "scope" => "openid profile",
+      "exp" => current_time() + @access_token_ttl,
+      "iss" => @issuer
+    }
+
+    Joken.generate_and_sign(claims, signer())
+  end
+
+  def create_refresh_token(%User{} = user) do
+    claims = %{
+      "sub" => user.email,
+      "exp" => current_time() + @refresh_token_ttl,
+      "iss" => @issuer
+    }
+
+    Joken.generate_and_sign(claims, signer())
+  end
+
+  def create_id_token(%User{} = user, nonce \\ nil) do
+    claims = %{
+      "sub" => user.email,
+      "name" => user.display_name,
+      "preferred_username" => user.user_name,
+      "discriminator" => user.descriminator,
+      "iss" => @issuer,
+      "exp" => current_time() + @access_token_ttl
+    }
+    |> maybe_put("nonce", nonce)
+
+    Joken.generate_and_sign(claims, signer())
+  end
+
+  defp current_time, do: DateTime.utc_now() |> DateTime.to_unix()
+
+  defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, key, val), do: Map.put(map, key, val)
+
 end

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import React from "react"
 import { Label } from "@/components/ui/label"
 import { useSearchParams } from 'react-router-dom';
+import { toast } from "sonner"
 
 const OK_STATUS = 200
 
@@ -12,6 +13,36 @@ export default function Login() {
     const [searchParams] = useSearchParams();
 
     console.log(searchParams)
+
+
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
+  
+    const handleSubmit = () => {
+
+      const auth: any = {};
+      searchParams.forEach((value, key) => {
+        auth[key] = value;
+      });
+
+
+      fetch("/api/v1/login", {
+        method: "POST",
+        body: JSON.stringify({
+          user: {
+            email,
+            password,
+          },
+          auth,
+        }),
+      }).then((res) => {
+          if (res.status !== 301) {
+              toast("Unable to Log into Account");
+            }
+      });
+    };
+
+    
   return (
     <>
 
@@ -22,7 +53,7 @@ export default function Login() {
             <Label htmlFor="email" className="">
               Email
             </Label>
-            <Input id="email" type="email" className="" placeholder="Email" onChange={(e) => {}} required />
+            <Input id="email" type="email" className="" placeholder="Email" onChange={(e) => {setEmail(e.target.value)}} required />
           </div>
           <div className="grid gap-2 mb-auto">
             <div className="flex items-center">
@@ -33,9 +64,9 @@ export default function Login() {
                 Forgot your password?
               </a>
             </div>
-            <Input id="password" type="password" className="2xl:text-3xl 2xl:h-14" placeholder="password" onChange={(e) => {}} required />
+            <Input id="password" type="password" className="2xl:text-3xl 2xl:h-14" placeholder="password" onChange={(e) => {setPassword(e.target.value)}} required />
           </div>
-          <Button className="w-full" onClick={(e) => {}}>
+          <Button className="w-full" onClick={(e) => {handleSubmit()}}>
             Login
           </Button>
         </div>
