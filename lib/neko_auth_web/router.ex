@@ -20,6 +20,11 @@ defmodule NekoAuthWeb.Router do
     get "/login", PageController, :login
   end
 
+  scope "/api/v1", NekoAuthWeb do
+    pipe_through :api
+    get "/oauth/authorize", OAuthController, :authorize
+  end
+
 
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
