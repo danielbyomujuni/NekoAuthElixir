@@ -10,4 +10,8 @@ defmodule NekoAuthWeb.PageController do
   def login(conn, _params) do
     render(conn, :login, layout: false)
   end
+
+  def register(conn, _params) do
+    render(conn, :login, layout: false)
+  end
 end

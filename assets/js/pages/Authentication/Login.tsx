@@ -17,7 +17,7 @@ export default function Login() {
 
       <div className="flex flex-col gap-4 h-full">
         <h1 className="text-3xl mb-3">Sign in</h1>
-        <div className="flex flex-col gap-8 mt-auto mb-auto">
+        <div className="flex flex-col gap-8 ">
           <div className="flex flex-col gap-2 mt-auto">
             <Label htmlFor="email" className="">
               Email
@@ -42,7 +42,7 @@ export default function Login() {
       </div>
       <div className="mt-4 text-center text-sm">
         Don&apos;t have an account?{" "}
-        <a href={"#"} className="underline hover:opacity-70">
+        <a href={`register?${searchParams.toString()}`} className="underline hover:opacity-70">
           Sign up
         </a>
       </div>

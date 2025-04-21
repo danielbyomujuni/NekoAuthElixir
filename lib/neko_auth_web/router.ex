@@ -18,6 +18,7 @@ defmodule NekoAuthWeb.Router do
     pipe_through :browser
     get "/", PageController, :home
     get "/login", PageController, :login
+    get "/register", PageController, :register
   end
 
   scope "/api/v1", NekoAuthWeb do
