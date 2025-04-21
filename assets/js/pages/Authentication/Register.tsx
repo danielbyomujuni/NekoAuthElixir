@@ -2,11 +2,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import React from "react"
-import { useSearchParams } from 'react-router-dom';
+import { Route, Router, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 
 export default function Register() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const [email, setEmail] = React.useState("");
     const [username, setUsername] = React.useState("");
@@ -25,7 +27,7 @@ export default function Register() {
         date_of_birth,
       }))
 
-        const res = await fetch("/api/v1/register", {
+        const res = await fetch("/api/v1/register?", {
           method: "POST",
           body: JSON.stringify({
             email,
@@ -39,6 +41,8 @@ export default function Register() {
     
         if (res.status !== 200) {
           toast((await res.json()).value);
+        } else {
+          navigate("/login?" + searchParams.toString());
         }
       };
     
