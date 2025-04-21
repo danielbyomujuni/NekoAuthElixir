@@ -7,9 +7,14 @@
 # General application configuration
 import Config
 
+
 config :demo,
   ecto_repos: [Demo.Repo],
   generators: [timestamp_type: :utc_datetime]
+
+
+config :demo, Demo.Repo,
+  url: "postgresql://elixir:password@192.168.1.76:5432/elixir_auth"
 
 # Configures the endpoint
 config :demo, DemoWeb.Endpoint,
