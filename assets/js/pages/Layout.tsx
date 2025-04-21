@@ -1,15 +1,14 @@
-/**
- * File from tailwindui
- */
-import React, { useState } from "react"
+import React from "react"
 import { Outlet } from "react-router"
+import { Toaster } from "@/components/ui/sonner"
+import { Background } from "@/components/Background"
 
 export function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
   return (
     <>
+      <Background />
       <Outlet />
+      <Toaster />
     </>
   )
 }

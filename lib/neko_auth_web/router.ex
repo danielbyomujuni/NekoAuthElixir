@@ -16,9 +16,11 @@ defmodule NekoAuthWeb.Router do
 
   scope "/", NekoAuthWeb do
     pipe_through :browser
-
     get "/", PageController, :home
+    get "/login", PageController, :login
   end
+
+
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:neko_auth, :dev_routes) do
