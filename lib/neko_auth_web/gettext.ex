@@ -1,4 +1,4 @@
-defmodule DemoWeb.Gettext do
+defmodule NekoAuthWeb.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
@@ -21,5 +21,5 @@ defmodule DemoWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext.Backend, otp_app: :demo
+  use Gettext.Backend, otp_app: :neko_auth
 end

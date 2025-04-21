@@ -1,4 +1,4 @@
-defmodule Demo.Application do
+defmodule NekoAuth.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,21 +8,21 @@ defmodule Demo.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      DemoWeb.Telemetry,
-      Demo.Repo,
-      {DNSCluster, query: Application.get_env(:demo, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Demo.PubSub},
+      NekoAuthWeb.Telemetry,
+      NekoAuth.Repo,
+      {DNSCluster, query: Application.get_env(:neko_auth, :dns_cluster_query) || :ignore},
+      {Phoenix.PubSub, name: NekoAuth.PubSub},
       # Start the Finch HTTP client for sending emails
-      {Finch, name: Demo.Finch},
+      {Finch, name: NekoAuth.Finch},
       # Start a worker by calling: Demo.Worker.start_link(arg)
       # {Demo.Worker, arg},
       # Start to serve requests, typically the last entry
-      DemoWeb.Endpoint
+      NekoAuthWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Demo.Supervisor]
+    opts = [strategy: :one_for_one, name: NekoAuth.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -30,7 +30,7 @@ defmodule Demo.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    DemoWeb.Endpoint.config_change(changed, removed)
+    NekoAuthWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

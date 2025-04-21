@@ -1,5 +1,5 @@
-defmodule DemoWeb.PageController do
-  use DemoWeb, :controller
+defmodule NekoAuthWeb.PageController do
+  use NekoAuthWeb, :controller
 
   def home(conn, _params) do
     # The home page is often custom made,

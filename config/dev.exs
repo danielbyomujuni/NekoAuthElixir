@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :demo, Demo.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "demo_dev",
+config :neko_auth, NekoAuth.Repo,
+  username: "elixir",
+  password: "password",
+  hostname: "192.168.1.76",
+  database: "elixir_auth",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :demo, Demo.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :demo, DemoWeb.Endpoint,
+config :neko_auth, NekoAuthWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4050],
@@ -52,17 +52,17 @@ config :demo, DemoWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :demo, DemoWeb.Endpoint,
+config :neko_auth, NekoAuthWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/demo_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/neko_auth_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :demo, dev_routes: true
+config :neko_auth, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

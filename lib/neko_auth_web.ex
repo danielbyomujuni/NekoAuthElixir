@@ -1,4 +1,4 @@
-defmodule DemoWeb do
+defmodule NekoAuthWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
@@ -16,7 +16,6 @@ defmodule DemoWeb do
   below. Instead, define additional modules and import
   those modules here.
   """
-
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
   def router do
@@ -40,9 +39,9 @@ defmodule DemoWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: DemoWeb.Layouts]
+        layouts: [html: NekoAuthWeb.Layouts]
 
-      use Gettext, backend: DemoWeb.Gettext
+      use Gettext, backend: NekoAuthWeb.Gettext
 
       import Plug.Conn
 
@@ -53,7 +52,7 @@ defmodule DemoWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {DemoWeb.Layouts, :app}
+        layout: {NekoAuthWeb.Layouts, :app}
 
       unquote(html_helpers())
     end
@@ -83,12 +82,12 @@ defmodule DemoWeb do
   defp html_helpers do
     quote do
       # Translation
-      use Gettext, backend: DemoWeb.Gettext
+      use Gettext, backend: NekoAuthWeb.Gettext
 
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components
-      import DemoWeb.CoreComponents
+      import NekoAuthWeb.CoreComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -101,9 +100,9 @@ defmodule DemoWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: DemoWeb.Endpoint,
-        router: DemoWeb.Router,
-        statics: DemoWeb.static_paths()
+        endpoint: NekoAuthWeb.Endpoint,
+        router: NekoAuthWeb.Router,
+        statics: NekoAuthWeb.static_paths()
     end
   end
 

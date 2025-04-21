@@ -1,5 +1,5 @@
-defmodule DemoWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :demo
+defmodule NekoAuthWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :neko_auth
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -21,9 +21,9 @@ defmodule DemoWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :demo,
+    from: :neko_auth,
     gzip: false,
-    only: DemoWeb.static_paths()
+    only: NekoAuthWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -31,7 +31,7 @@ defmodule DemoWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :demo
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :neko_auth
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,
@@ -50,5 +50,5 @@ defmodule DemoWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
 
-  plug DemoWeb.Router
+  plug NekoAuthWeb.Router
 end

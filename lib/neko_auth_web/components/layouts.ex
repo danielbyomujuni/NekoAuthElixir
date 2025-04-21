@@ -1,4 +1,4 @@
-defmodule DemoWeb.Layouts do
+defmodule NekoAuthWeb.Layouts do
   @moduledoc """
   This module holds different layouts used by your application.
 
@@ -8,7 +8,7 @@ defmodule DemoWeb.Layouts do
   layout on both `use DemoWeb, :controller` and
   `use DemoWeb, :live_view`.
   """
-  use DemoWeb, :html
+  use NekoAuthWeb, :html
 
   embed_templates "layouts/*"
 end

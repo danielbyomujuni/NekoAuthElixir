@@ -1,4 +1,4 @@
-defmodule Demo do
+defmodule NekoAuth do
   @moduledoc """
   Demo keeps the contexts that define your domain
   and business logic.

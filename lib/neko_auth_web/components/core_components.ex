@@ -1,4 +1,4 @@
-defmodule DemoWeb.CoreComponents do
+defmodule NekoAuthWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
 

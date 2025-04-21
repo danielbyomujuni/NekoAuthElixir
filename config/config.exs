@@ -8,23 +8,19 @@
 import Config
 
 
-config :demo,
-  ecto_repos: [Demo.Repo],
+config :neko_auth,
+  ecto_repos: [NekoAuth.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-
-config :demo, Demo.Repo,
-  url: "postgresql://elixir:password@192.168.1.76:5432/elixir_auth"
-
 # Configures the endpoint
-config :demo, DemoWeb.Endpoint,
+config :neko_auth, NekoAuthWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: DemoWeb.ErrorHTML, json: DemoWeb.ErrorJSON],
+    formats: [html: NekoAuthWeb.ErrorHTML, json: NekoAuthWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Demo.PubSub,
+  pubsub_server: NekoAuth.PubSub,
   live_view: [signing_salt: "eRACoPmy"]
 
 # Configures the mailer
@@ -34,7 +30,7 @@ config :demo, DemoWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :demo, Demo.Mailer, adapter: Swoosh.Adapters.Local
+#config :demo, Demo.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configures Elixir's Logger
 config :logger, :console,
