@@ -13,6 +13,10 @@ defmodule NekoAuth.MixProject do
     ]
   end
 
+  def cli do
+    [preferred_envs: ["coverage": :test]]
+  end
+
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
@@ -25,6 +29,7 @@ defmodule NekoAuth.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
+
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -69,7 +74,7 @@ defmodule NekoAuth.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      coverage: ["mix test --cover --export-coverage default","mix test.coverage"],
+      coverage: ["test --cover"],
       "assets.install": ["cmd (cd assets && yarn install)"],
       "assets.tsc": ["cmd (cd assets && yarn run tsc)"]
     ]
