@@ -57,6 +57,9 @@ defmodule DomainValidator do
       nullable && is_nil(value) ->
         true
 
+      !nullable && is_nil(value) ->
+        false
+
       true ->
         try do
           is_greater_than_min = is_nil(opts[:min_value]) || compare(value, opts[:min_value], :>=)
@@ -65,8 +68,8 @@ defmodule DomainValidator do
           is_shorter_than_max_length = is_nil(opts[:max_length]) || String.length(to_string(value)) <= opts[:max_length]
           does_regex_match = is_nil(opts[:regex]) || Regex.match?(Regex.compile!(opts[:regex]), to_string(value))
           does_exist_in = is_nil(opts[:exists_in]) || value in opts[:exists_in]
-          is_number = is_nil(opts[:is_number]) || (opts[:is_number] == is_number(to_string(value)))
-          is_valid_url = is_nil(opts[:valid_url]) || !throws?(fn -> URI.parse(to_string(value)) end)
+          is_number = is_nil(opts[:is_number]) || (opts[:is_number] == is_number(value))
+          is_valid_url = is_nil(opts[:valid_url]) || true #Disabled due to the differing behavior of URI.parse/1 from Javascript
 
           is_greater_than_min &&
             is_less_than_max &&
