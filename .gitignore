@@ -1,0 +1,6 @@
+*.env
+_build
+.elixir_ls
+assets/node_modules
+deps/*
+priv/static/*
