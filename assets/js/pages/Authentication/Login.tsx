@@ -4,13 +4,17 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import React from "react"
 import { Label } from "@/components/ui/label"
+import { useSearchParams } from 'react-router-dom';
 
 const OK_STATUS = 200
 
 export default function Login() {
+    const [searchParams] = useSearchParams();
+
+    console.log(searchParams)
   return (
     <>
-    
+
       <div className="flex flex-col gap-4 h-full">
         <h1 className="text-3xl mb-3">Sign in</h1>
         <div className="flex flex-col gap-8 mt-auto mb-auto">
