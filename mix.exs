@@ -69,6 +69,7 @@ defmodule NekoAuth.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      coverage: ["mix test --cover --export-coverage default","mix test.coverage"],
       "assets.install": ["cmd (cd assets && yarn install)"],
       "assets.tsc": ["cmd (cd assets && yarn run tsc)"]
     ]
