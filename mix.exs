@@ -61,7 +61,10 @@ defmodule NekoAuth.MixProject do
 
       # App libs
       {:absinthe, "~> 1.7"},
-      {:absinthe_plug, "~> 1.5"}
+      {:absinthe_plug, "~> 1.5"},
+
+      # Test libs
+      {:junit_formatter, "~> 3.4", only: [:test]}
     ]
   end
 

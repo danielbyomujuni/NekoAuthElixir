@@ -33,6 +33,12 @@ config :swoosh, :api_client, false
 # Print only warnings and errors during test
 config :logger, level: :warning
 
+config :junit_formatter,
+  report_file: "report.xml",
+  report_dir: "./",
+  print_report_file: true,
+  include_filename?: true
+
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 
