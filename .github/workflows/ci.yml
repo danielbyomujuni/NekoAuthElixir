@@ -9,7 +9,7 @@ on:
 env:
   MIX_ENV: test
   POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: ci_pipeline_password
+  POSTGRES_PWD: ci_pipeline_password
   POSTGRES_DB: neko_auth_test
   POSTGRES_HOST: localhost
   SALT_ROUNDS: 10
@@ -24,7 +24,7 @@ jobs:
         ports: [5432:5432]
         env:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PWD }}
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
         options: >-
           --health-cmd pg_isready
@@ -85,7 +85,7 @@ jobs:
         ports: [5432:5432]
         env:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PWD }}
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
         options: >-
           --health-cmd pg_isready
@@ -129,7 +129,7 @@ jobs:
         ports: [5432:5432]
         env:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PWD }}
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
         options: >-
           --health-cmd pg_isready
