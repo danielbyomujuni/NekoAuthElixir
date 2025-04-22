@@ -22,6 +22,7 @@ variables:
 # Install Node.js for assets
 before_script:
   - apt-get update && apt-get install -y curl npm
+  - touch testing.env.exs
   - mix setup
 
 deps:
