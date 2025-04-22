@@ -23,7 +23,6 @@ variables:
 before_script:
   - apk add --update nodejs npm make yarn gcc
   - touch testing.env.exs
-  - mix deps.compile bcrypt_elixir --force
   - mix setup --force
 
 deps:
