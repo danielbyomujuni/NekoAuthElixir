@@ -21,7 +21,7 @@ variables:
 
 # Install Node.js for assets
 before_script:
-  - apk add --update nodejs npm make
+  - apk add --update nodejs npm make yarn
   - touch testing.env.exs
   - mix setup --force
 
