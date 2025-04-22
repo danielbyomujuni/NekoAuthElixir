@@ -161,9 +161,3 @@ jobs:
           touch testing.env.exs
           mix setup.pipeline
           mix coverage
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: cover/
