@@ -1,0 +1,49 @@
+image: elixir:1.14
+
+stages:
+  - deps
+  - build
+  - test
+
+services:
+  - postgres:latest
+
+variables:
+  MIX_ENV: test
+  FF_NETWORK_PER_BUILD: 1
+  POSTGRES_PASSWORD: ci_pipeline_password
+  BACKEND_POSTGRES_HOST: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_HOST: postgres
+  POSTGRES_PWD: ci_pipeline_password
+  POSTGRES_DATABASE: neko_auth_test
+
+
+# Install Node.js for assets
+before_script:
+  - apt-get update && apt-get install -y curl npm
+  - mix setup
+
+deps:
+  stage: deps
+  script:
+    - mix deps.get
+  artifacts:
+    paths:
+      - _build
+      - deps
+
+build:
+  stage: build
+  script:
+    - mix compile
+
+test:
+  stage: test
+  script:
+    - mix setup
+    - mix test
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
