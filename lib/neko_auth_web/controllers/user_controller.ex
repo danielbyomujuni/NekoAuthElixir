@@ -108,7 +108,7 @@ defmodule NekoAuthWeb.UserController do
         redirect_uri = generate_redirect_uri(
           authorize_domain.redirect_uri,
           "",
-          code: "abc123", state: authorize_domain.state
+          code: UserManager.generate_auth_code(user), state: authorize_domain.state
         )
           conn
           |> put_resp_header("location", redirect_uri)

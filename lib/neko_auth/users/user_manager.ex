@@ -8,11 +8,14 @@ defmodule NekoAuth.User.UserManager do
   alias NekoAuth.Repo
   alias Result
   alias RegistrationStruct
+  alias Base
 
   # 15 minutes
   @access_token_ttl 15 * 60
   # 1 day
   @refresh_token_ttl 60 * 60 * 24
+  # 15 minutes
+  @auth_code_ttl 15 * 60
   @issuer "neko_auth"
 
   @spec register_new_user(%RegistrationStruct{
@@ -112,6 +115,22 @@ defmodule NekoAuth.User.UserManager do
     JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
   end
 
+  def generate_auth_code(%User{} = user) do
+    key = signer()
+    |> JOSE.JWK.to_public()
+
+    #IO.inspect(key)
+
+    {_, jwe_map} = %{
+      account: user.email,
+      exp: current_time() + @auth_code_ttl
+    }
+    |> Jason.encode!()
+    |> Base.encode64()
+    |> JOSE.JWK.block_encrypt(key)
+
+    jwe_map["ciphertext"]
+  end
   defp current_time, do: DateTime.utc_now() |> DateTime.to_unix()
 
   defp maybe_put(map, _key, nil), do: map
