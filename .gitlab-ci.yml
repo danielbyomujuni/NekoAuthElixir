@@ -23,9 +23,7 @@ variables:
 before_script:
   - apk add --update nodejs npm
   - touch testing.env.exs
-  - mix local.hex --force
-  - mix local.rebar --force
-  - mix setup
+  - mix setup --force
 
 deps:
   stage: deps
