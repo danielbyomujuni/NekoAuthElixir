@@ -5,13 +5,15 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+
+import_config "../testing.env.exs"
+
+
 config :neko_auth, NekoAuth.Repo,
-    #username: "elixir",
-    username: "danielbyomujuni",
-    #password: "password",
-    #hostname: "192.168.1.76",
-    hostname: "localhost",
-  database: "elixir_auth_test#{System.get_env("MIX_TEST_PARTITION")}",
+  username: System.get_env("POSTGRES_USER"),
+  hostname: System.get_env("POSTGRES_HOST"),
+  password: System.get_env("POSTGRES_PWD"),
+  database: "#{System.get_env("POSTGRES_DATABASE")}#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

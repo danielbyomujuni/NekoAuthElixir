@@ -1,13 +1,13 @@
 import Config
 
+import_config "../.env.exs"
+
 # Configure your database
 config :neko_auth, NekoAuth.Repo,
-  #username: "elixir",
-  username: "danielbyomujuni",
-  #password: "password",
-  #hostname: "192.168.1.76",
-  hostname: "localhost",
-  database: "elixir_auth",
+  username: System.get_env("POSTGRES_USER"),
+  hostname: System.get_env("POSTGRES_HOST"),
+  password: System.get_env("POSTGRES_PWD"),
+  database: System.get_env("POSTGRES_DATABASE"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
