@@ -74,6 +74,7 @@ defmodule NekoAuth.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.install", "assets.tsc"],
+      "setup.pipeline": ["deps.get --force", "ecto.setup --force", "assets.install --force", "assets.tsc"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
