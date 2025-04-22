@@ -2,6 +2,8 @@ defmodule NekoAuth.User.UserManager do
   @moduledoc """
   Manager module for registering and managing user accounts.
   """
+   @behaviour NekoAuth.UserManagerBehavior
+
 
   alias NekoAuth.Users.User
   alias NekoAuth.Domains.UserDomain
@@ -40,9 +42,9 @@ defmodule NekoAuth.User.UserManager do
     with true <- UserDomain.is_registration_valid?(new_user_data),
          false <- UserDomain.user_exists?(new_user_data.email),
          {:ok, discriminator} <- UserDomain.request_next_discriminator(new_user_data.user_name),
-         IO.puts("Discriminator: #{discriminator}"),
+         #IO.puts("Discriminator: #{discriminator}"),
          password_hash <- UserDomain.hash_password(new_user_data.password),
-         IO.puts("Password: #{password_hash}"),
+         #IO.puts("Password: #{password_hash}"),
          user_attrs = %{
            email: new_user_data.email,
            display_name: new_user_data.display_name,

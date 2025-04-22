@@ -52,19 +52,21 @@ defmodule NekoAuth.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
-      {:jason, "~> 1.2"},
-      {:joken, "~> 2.6"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:bcrypt_elixir, "~> 3.0"},
-      {:jose, "~> 1.11"},
 
       # App libs
       {:absinthe, "~> 1.7"},
       {:absinthe_plug, "~> 1.5"},
+      {:bcrypt_elixir, "~> 3.0"},
+      {:jose, "~> 1.11"},
+      {:jason, "~> 1.2"},
+      {:joken, "~> 2.6"},
 
       # Test libs
-      {:junit_formatter, "~> 3.4", only: [:test]}
+      {:junit_formatter, "~> 3.4", only: [:test]},
+      {:mox, "~> 1.0", only: :test}
+
     ]
   end
 
