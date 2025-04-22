@@ -17,6 +17,7 @@ variables:
   POSTGRES_HOST: postgres
   POSTGRES_PWD: ci_pipeline_password
   POSTGRES_DATABASE: neko_auth_test
+  SALT_ROUNDS: 10
 
 
 # Install Node.js for assets
