@@ -81,12 +81,6 @@ defmodule AuthorizeDomain do
     |> URI.to_string()
   end
 
-  def get_response_type(%__MODULE__{response_type: rt}), do: rt
-  def get_scope(%__MODULE__{scope: s}), do: s
-  def get_client_id(%__MODULE__{client_id: id}), do: id
-  def get_redirect_uri(%__MODULE__{redirect_uri: uri}), do: uri
-  def get_state(%__MODULE__{state: state}), do: state
-
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, val), do: Map.put(map, key, val)
 

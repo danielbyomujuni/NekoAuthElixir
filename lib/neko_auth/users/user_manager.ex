@@ -8,14 +8,25 @@ defmodule NekoAuth.User.UserManager do
   alias NekoAuth.Repo
   alias Result
   alias RegistrationStruct
-  alias Joken.Signer
 
-  @access_token_ttl 15 * 60        # 15 minutes
-  @refresh_token_ttl 60 * 60 * 24  # 1 day
+  # 15 minutes
+  @access_token_ttl 15 * 60
+  # 1 day
+  @refresh_token_ttl 60 * 60 * 24
   @issuer "neko_auth"
 
-  defp signer, do: TokenSigner.load_private_key()
+  @spec register_new_user(%RegistrationStruct{
+          email: false | nil | binary(),
+          display_name: binary(),
+          user_name: binary(),
+          password: binary(),
+          date_of_birth: Date.t()
+        }) :: {:error, any()} | {:ok, any()}
 
+  def signer do
+    Path.join(:code.priv_dir(:neko_auth), "keys/private_key.pem")
+    |> JOSE.JWK.from_pem_file()
+  end
 
   @doc """
   Registers a new user from validated registration data.
@@ -39,8 +50,7 @@ defmodule NekoAuth.User.UserManager do
            email_verified: false
          },
          changeset = User.changeset(%User{}, user_attrs),
-         {:ok, user} <- Repo.insert(changeset)
-    do
+         {:ok, user} <- Repo.insert(changeset) do
       Result.from(user)
     else
       false -> Result.err("Invalid User Domain")
@@ -73,9 +83,10 @@ defmodule NekoAuth.User.UserManager do
       "iss" => @issuer
     }
 
-    Joken.generate_and_sign(claims, signer())
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
   end
 
+  @spec create_refresh_token(any()) :: none()
   def create_refresh_token(%User{} = user) do
     claims = %{
       "sub" => user.email,
@@ -83,26 +94,26 @@ defmodule NekoAuth.User.UserManager do
       "iss" => @issuer
     }
 
-    Joken.generate_and_sign(claims, signer())
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
   end
 
   def create_id_token(%User{} = user, nonce \\ nil) do
-    claims = %{
-      "sub" => user.email,
-      "name" => user.display_name,
-      "preferred_username" => user.user_name,
-      "discriminator" => user.descriminator,
-      "iss" => @issuer,
-      "exp" => current_time() + @access_token_ttl
-    }
-    |> maybe_put("nonce", nonce)
+    claims =
+      %{
+        "sub" => user.email,
+        "name" => user.display_name,
+        "preferred_username" => user.user_name,
+        "discriminator" => user.descriminator,
+        "iss" => @issuer,
+        "exp" => current_time() + @access_token_ttl
+      }
+      |> maybe_put("nonce", nonce)
 
-    Joken.generate_and_sign(claims, signer())
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
   end
 
   defp current_time, do: DateTime.utc_now() |> DateTime.to_unix()
 
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, val), do: Map.put(map, key, val)
-
 end

@@ -67,6 +67,16 @@ defmodule NekoAuthWeb.UserController do
     end
   end
 
+    @spec generate_redirect_uri(String.t(), String.t(), keyword()) :: String.t()
+    def generate_redirect_uri(base_url, path, query_params \\ []) do
+      uri = URI.merge(base_url, path)
+      query = URI.encode_query(query_params)
+      uri_with_query = %URI{uri | query: query}
+      URI.to_string(uri_with_query)
+    end
+
+
+
   @doc """
   Handles OAuth2 authorization login and session generation.
   """
@@ -79,37 +89,31 @@ defmodule NekoAuthWeb.UserController do
       # Ensure local session exists
       conn =
         if fetch_cookies(conn).cookies["local_refresh_token"] == nil do
-          with {:ok, local_session} <- user.create_new_local_session(), #currently Errors
-               {:ok, refresh_token} <- local_session.request_refresh_token(),
-               {:ok, access_token} <- local_session.request_access_token(user) do
+          refresh_token = UserManager.create_refresh_token(user)
+          access_token = UserManager.create_access_token(user)
             conn
             |> put_resp_cookie("local_refresh_token", refresh_token, http_only: true)
             |> put_resp_cookie("local_access_token", access_token, http_only: true)
-          else
-            _ -> send_resp(conn, 400, "") |> halt()
-          end
         else
           conn
         end
 
       # Validate response_type
-      if authorize_domain.get_response_type() != "code" do
-        send_resp(conn, 400, "")
+      #IO.puts("YOU HAVE FAILED ME FOR THE FIRST TIME")
+      if authorize_domain.response_type != "code" do
+        send_resp(conn, 400, "INVALID DOMAIN")
       else
-        with {:ok, session} <-
-               user.create_new_session(
-                 authorize_domain.get_client_id(),
-                 authorize_domain.get_scope()
-               ),
-             {:ok, redirect_uri} <-
-               session.request_authorization_code_redirect_uri(authorize_domain),
-             :ok <- user.save_to_database() do
+
+        #IO.puts("YOU HAVE FAILED ME FOR THE LAST TIME")
+        redirect_uri = generate_redirect_uri(
+          authorize_domain.redirect_uri,
+          "",
+          code: "abc123", state: authorize_domain.state
+        )
           conn
-          |> put_resp_header("location", URI.to_string(redirect_uri))
-          |> send_resp(301, "")
-        else
-          _ -> send_resp(conn, 400, "")
-        end
+          |> put_resp_header("location", redirect_uri)
+          |> send_resp(201, "")
+
       end
     else
       {:error, reason} ->

@@ -36,9 +36,11 @@ export default function Login() {
           auth,
         }),
       }).then((res) => {
-          if (res.status !== 301) {
+          if (res.status !== 201) {
               toast("Unable to Log into Account");
-            }
+          } else {
+            window.location.href = res.headers.get("Location")!;
+          }
       });
     };
 
