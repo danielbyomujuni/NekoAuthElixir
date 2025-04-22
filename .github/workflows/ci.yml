@@ -35,6 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Create Env blank
+        run: touch testing.env.exs
+
       - name: Set up Elixir
         uses: erlef/setup-elixir@v1
         with:
@@ -67,9 +70,7 @@ jobs:
           restore-keys: ${{ runner.os }}-build
 
       - name: Run setup.pipeline
-        run: |
-          touch testing.env.exs
-          mix setup.pipeline
+        run: mix setup.pipeline
 
       - name: Compile project
         run: mix compile
@@ -94,6 +95,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Create Env blank
+        run: touch testing.env.exs
+
       - uses: erlef/setup-elixir@v1
         with:
           elixir-version: 1.18.3
@@ -109,9 +114,7 @@ jobs:
           restore-keys: ${{ runner.os }}-build
 
       - name: Run Ecto setup
-        run: |
-          touch testing.env.exs
-          mix setup.pipeline
+        run: mix setup.pipeline
 
       - name: Run Tests
         run: mix test
@@ -140,6 +143,9 @@ jobs:
         with:
           elixir-version: 1.18.3
           otp-version: 26
+
+      - name: Create Env blank
+        run: touch testing.env.exs
 
       - name: Restore build/deps cache
         uses: actions/cache@v3
