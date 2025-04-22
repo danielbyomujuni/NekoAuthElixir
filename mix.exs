@@ -78,8 +78,8 @@ defmodule NekoAuth.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       coverage: ["test --cover"],
-      "assets.install": ["cmd (cd assets && yarn install)"],
-      "assets.tsc": ["cmd (cd assets && yarn run tsc)"],
+      "assets.install": ["cmd cd assets && yarn install"],
+      "assets.tsc": ["cmd cd assets && yarn run tsc"],
       run: ["phx.server"]
     ]
   end
