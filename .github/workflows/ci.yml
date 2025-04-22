@@ -66,11 +66,10 @@ jobs:
           key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-build
 
-      - name: Install Elixir deps
-        run: mix deps.get
-
       - name: Run setup.pipeline
-        run: mix setup.pipeline
+        run: |
+          touch testing.env.exs
+          mix setup.pipeline
 
       - name: Compile project
         run: mix compile
@@ -110,7 +109,9 @@ jobs:
           restore-keys: ${{ runner.os }}-build
 
       - name: Run Ecto setup
-        run: mix setup
+        run: |
+          touch testing.env.exs
+          mix setup.pipeline
 
       - name: Run Tests
         run: mix test
@@ -151,8 +152,8 @@ jobs:
 
       - name: Run Coverage
         run: |
-          mix ecto.create --quiet
-          mix ecto.migrate --quiet
+          touch testing.env.exs
+          mix setup.pipeline
           mix coverage
 
       - name: Upload coverage report
