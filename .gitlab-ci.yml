@@ -23,6 +23,7 @@ variables:
 before_script:
   - apt-get update && apt-get install -y curl npm
   - touch testing.env.exs
+  - mix local.hex --force
   - mix setup
 
 deps:
