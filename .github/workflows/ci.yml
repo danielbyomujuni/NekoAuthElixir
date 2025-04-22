@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  MIX_ENV: test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: ci_pipeline_password
+  POSTGRES_DB: neko_auth_test
+  POSTGRES_HOST: localhost
+  SALT_ROUNDS: 10
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: Install Deps and Setup
+    services:
+      postgres:
+        image: postgres:latest
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: 1.18.3
+          otp-version: 26
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git libssl-dev
+          npm install --global yarn
+
+      - name: Cache mix deps
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix
+
+      - name: Cache _build
+        uses: actions/cache@v3
+        with:
+          path: _build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build
+
+      - name: Install Elixir deps
+        run: mix deps.get
+
+      - name: Run setup.pipeline
+        run: mix setup.pipeline
+
+      - name: Compile project
+        run: mix compile
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    name: Run Tests
+    services:
+      postgres:
+        image: postgres:latest
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: 1.18.3
+          otp-version: 26
+
+      - name: Restore build/deps cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build
+
+      - name: Run Ecto setup
+        run: mix setup
+
+      - name: Run Tests
+        run: mix test
+
+  coverage:
+    needs: setup
+    runs-on: ubuntu-latest
+    name: Test Coverage
+    services:
+      postgres:
+        image: postgres:latest
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: 1.18.3
+          otp-version: 26
+
+      - name: Restore build/deps cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build
+
+      - name: Run Coverage
+        run: |
+          mix ecto.create --quiet
+          mix ecto.migrate --quiet
+          mix coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: cover/
