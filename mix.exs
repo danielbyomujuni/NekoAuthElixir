@@ -14,7 +14,7 @@ defmodule NekoAuth.MixProject do
   end
 
   def cli do
-    [preferred_envs: ["coverage": :test]]
+    [preferred_envs: [coverage: :test]]
   end
 
   # Configuration for the OTP application.
