@@ -35,5 +35,6 @@ demo-*.tar
 npm-debug.log
 /assets/node_modules/
 
-*.env
-!pipeline.env
+*.env.exs
+!pipeline.env.exs
+
