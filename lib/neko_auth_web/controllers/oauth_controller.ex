@@ -4,6 +4,7 @@ defmodule NekoAuthWeb.OAuthController do
   alias NekoAuth.User.UserManager
   alias AuthorizeDomain
   alias Result
+  alias Plug.Conn
 
   @token_type "Bearer"
   @expires_in 3600
@@ -89,7 +90,8 @@ defmodule NekoAuthWeb.OAuthController do
   defp handle_refresh_token_grant(conn, %{"refresh_token" => refresh_token}) do
     with {:ok, user} <- UserManager.user_from_refresh_token(refresh_token),
          access_token <- UserManager.create_access_token(user) do
-      if Conn.get_req_cookie(conn, "local_refresh_token") == refresh_token do
+      conn = fetch_cookies(conn)
+      if Map.get(conn.cookies, "local_refresh_token") == refresh_token do
         put_resp_cookie(conn, "local_access_token", access_token, http_only: true)
       else
         conn

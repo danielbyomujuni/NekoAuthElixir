@@ -112,5 +112,33 @@ defmodule NekoAuthWeb.OAuthControllerTest do
 
       assert json_response(conn, 400)["error_description"] =~ "[T101]"
     end
+    test "returns token for valid refresh_token", %{conn: conn, user: user} do
+      refresh_token = UserManager.create_refresh_token(user)
+
+      conn =
+        conn
+        |> put_req_cookie("local_refresh_token", refresh_token)
+        |> post("/api/v1/oauth/token", %{
+          "grant_type" => "refresh_token",
+          "refresh_token" => refresh_token
+        })
+
+      assert json = json_response(conn, 200)
+      assert json["access_token"]
+      assert json["refresh_token"] == refresh_token
+      assert json["token_type"] == "Bearer"
+      assert json["expires_in"]
+    end
+
+    test "returns error for invalid refresh_token", %{conn: conn} do
+      conn =
+        conn
+        |> post("/api/v1/oauth/token", %{
+          "grant_type" => "refresh_token",
+          "refresh_token" => "invalid.token.value"
+        })
+
+      assert json_response(conn, 400)["error_description"] =~ "[T104] Invalid Token"
+    end
   end
 end

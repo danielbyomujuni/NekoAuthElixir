@@ -101,6 +101,19 @@ defmodule NekoAuth.User.UserManager do
     JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact() |> elem(1)
   end
 
+  def user_from_refresh_token(token) do
+    key = signer()
+      |> JOSE.JWK.to_public()
+    with {true, jwt, _} <- JOSE.JWT.verify(key, {%{alg: :jose_jws_alg_rsa_pkcs1_v1_5}, token}),
+        {%{}, %{"sub" => email, "exp" => exp}} <- JOSE.JWT.to_map(jwt),
+         true <- current_time() < exp,
+         user when not is_nil(user) <- Repo.get(User, email) do
+        {:ok, user}
+    else
+      _ -> {:error, :invalid_token}
+    end
+  end
+
   def create_id_token(%User{} = user, nonce \\ nil) do
     claims =
       %{
