@@ -1,9 +1,5 @@
 defmodule NekoAuthWeb.UserControllerTest do
   use NekoAuthWeb.ConnCase, async: true
-
-  alias NekoAuth.Users.User
-  alias NekoAuth.Repo
-  alias NekoAuth.User.UserManager
   alias RegistrationStruct
 
   @valid_user_json ~s({

@@ -20,8 +20,6 @@ defmodule DomainValidator do
     - `:nullable` to allow `nil` values as valid
   """
 
-  @author "Daniel Byomujuni <danielbyomujuni@nekosyndicate.com>"
-
   defstruct value: nil
 
   @doc """
@@ -89,13 +87,4 @@ defmodule DomainValidator do
   defp compare(val1, val2, :>=), do: val1 >= val2
   defp compare(val1, val2, :<=), do: val1 <= val2
 
-  @doc false
-  defp throws?(func) do
-    try do
-      func.()
-      false
-    rescue
-      _ -> true
-    end
-  end
 end

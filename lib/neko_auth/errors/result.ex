@@ -18,9 +18,7 @@ defmodule Result do
 
       Result.get_error({:error, "fail"})
       # => "fail"
-  """
-
-  @author "Daniel Byomujuni <danielbyomujuni@nekosyndicate.com>"
+  ""
 
   @doc """
   Wraps a value in an `:ok` tuple.

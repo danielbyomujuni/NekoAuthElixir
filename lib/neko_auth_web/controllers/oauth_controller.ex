@@ -4,7 +4,6 @@ defmodule NekoAuthWeb.OAuthController do
   alias NekoAuth.User.UserManager
   alias AuthorizeDomain
   alias Result
-  alias Plug.Conn
 
   @token_type "Bearer"
   @expires_in 3600

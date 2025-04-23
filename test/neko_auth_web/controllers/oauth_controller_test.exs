@@ -3,8 +3,8 @@ defmodule NekoAuthWeb.OAuthControllerTest do
 
   import Phoenix.ConnTest
   alias NekoAuth.User.UserManager
-  alias NekoAuthWeb.Router.Helpers, as: Routes
   alias NekoAuth.Users.User
+
 
   @valid_params %{
     "response_type" => "code",

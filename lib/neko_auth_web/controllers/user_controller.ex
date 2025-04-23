@@ -50,7 +50,7 @@ def register(conn, _params) do
         |> json(%{success: false, value: reason})
     end
   else
-    {:error, %Jason.DecodeError{} = e} ->
+    {:error, %Jason.DecodeError{} = _} ->
       conn
       |> put_status(401)
       |> json(%{success: false, error: "Invalid JSON"})
