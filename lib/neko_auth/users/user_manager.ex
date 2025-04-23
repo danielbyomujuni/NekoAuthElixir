@@ -2,8 +2,7 @@ defmodule NekoAuth.User.UserManager do
   @moduledoc """
   Manager module for registering and managing user accounts.
   """
-   @behaviour NekoAuth.UserManagerBehavior
-
+  @behaviour NekoAuth.UserManagerBehavior
 
   alias NekoAuth.Users.User
   alias NekoAuth.Domains.UserDomain
@@ -16,8 +15,8 @@ defmodule NekoAuth.User.UserManager do
   @access_token_ttl 15 * 60
   # 1 day
   @refresh_token_ttl 60 * 60 * 24
-  # 15 minutes
-  @auth_code_ttl 15 * 60
+  # 1 minute
+  @auth_code_ttl 1 * 60
   @issuer "neko_auth"
 
   @spec register_new_user(%RegistrationStruct{
@@ -42,9 +41,9 @@ defmodule NekoAuth.User.UserManager do
     with true <- UserDomain.is_registration_valid?(new_user_data),
          false <- UserDomain.user_exists?(new_user_data.email),
          {:ok, discriminator} <- UserDomain.request_next_discriminator(new_user_data.user_name),
-         #IO.puts("Discriminator: #{discriminator}"),
+         # IO.puts("Discriminator: #{discriminator}"),
          password_hash <- UserDomain.hash_password(new_user_data.password),
-         #IO.puts("Password: #{password_hash}"),
+         # IO.puts("Password: #{password_hash}"),
          user_attrs = %{
            email: new_user_data.email,
            display_name: new_user_data.display_name,
@@ -88,7 +87,7 @@ defmodule NekoAuth.User.UserManager do
       "iss" => @issuer
     }
 
-    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact() |> elem(1)
   end
 
   @spec create_refresh_token(any()) :: none()
@@ -99,7 +98,7 @@ defmodule NekoAuth.User.UserManager do
       "iss" => @issuer
     }
 
-    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact() |> elem(1)
   end
 
   def create_id_token(%User{} = user, nonce \\ nil) do
@@ -114,25 +113,44 @@ defmodule NekoAuth.User.UserManager do
       }
       |> maybe_put("nonce", nonce)
 
-    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact |> elem(1)
+    JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact() |> elem(1)
   end
 
   def generate_auth_code(%User{} = user) do
-    key = signer()
-    |> JOSE.JWK.to_public()
+    key =
+      signer()
+      |> JOSE.JWK.to_public()
 
-    #IO.inspect(key)
+    # IO.inspect(key)
 
-    {_, jwe_map} = %{
-      account: user.email,
-      exp: current_time() + @auth_code_ttl
-    }
-    |> Jason.encode!()
-    |> Base.encode64()
-    |> JOSE.JWK.block_encrypt(key)
+    {_, compact_token} =
+      %{
+        account: user.email,
+        exp: current_time() + @auth_code_ttl
+      }
+      |> Jason.encode!()
+      |> Base.encode64()
+      |> JOSE.JWK.block_encrypt(key)
+      |> JOSE.JWE.compact()
 
-    jwe_map["ciphertext"]
+      compact_token
   end
+
+  def user_from_auth_code(code) do
+    #IO.puts("Code: #{code}")
+    signer = signer()
+
+    with  {plain_text, _} <- JOSE.JWK.block_decrypt(code, signer),
+          {:ok, decoded_json} <- Base.decode64(plain_text),
+          {:ok, %{"account" => email, "exp" => exp}} <- Jason.decode(decoded_json),
+            true <- current_time() < exp,
+            user when not is_nil(user) <- Repo.get(User, email) do
+              {:ok, user}
+    else
+      _ -> {:error, :decryption_failed}
+    end
+  end
+
   defp current_time, do: DateTime.utc_now() |> DateTime.to_unix()
 
   defp maybe_put(map, _key, nil), do: map
