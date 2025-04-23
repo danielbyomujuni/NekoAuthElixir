@@ -76,22 +76,19 @@ defmodule NekoAuthWeb.OAuthController do
         id_token: id_token
       })
     else
-      #{:error, :invalid_code} ->
-      #  error_response(conn, "[T001] Invalid Authorization Code")
-
-      #:error, :no_session} ->
-      #  error_response(conn, "[T102] No Existing Session")
-
-      #{:error, :token_failure} ->
-      #  error_response(conn, "[T103] Failure to create Access Token")
       {:error, response } -> error_response(conn, "[T104] #{response}")
     end
   end
 
+  defp handle_authorization_code_grant(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{error: "invalid_request", error_description: "[T101] Empty Token"})
+  end
+
   defp handle_refresh_token_grant(conn, %{"refresh_token" => refresh_token}) do
     with {:ok, user} <- UserManager.user_from_refresh_token(refresh_token),
-         {:ok, session} <- UserManager.request_existing_session(user, refresh_token),
-         {:ok, access_token} <- UserManager.create_access_token(session, user) do
+         access_token <- UserManager.create_access_token(user) do
       if Conn.get_req_cookie(conn, "local_refresh_token") == refresh_token do
         put_resp_cookie(conn, "local_access_token", access_token, http_only: true)
       else
