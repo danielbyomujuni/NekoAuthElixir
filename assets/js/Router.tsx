@@ -5,6 +5,7 @@ import { Home } from "./pages/Home"
 import Login from "./pages/Authentication/Login"
 import AuthenticationLayout from "./pages/Authentication/AuthLayout"
 import Register from "./pages/Authentication/Register"
+import { LayoutPortal } from "./pages/Portal/LayoutPortal"
 
 export const router = () =>
   createBrowserRouter([
@@ -29,6 +30,9 @@ export const router = () =>
               element: <Register />
             }
           ]
+        }, {
+          path: "/portal",
+          element: <LayoutPortal />,
         }
       ]
     }
