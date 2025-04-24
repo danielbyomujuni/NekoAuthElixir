@@ -70,6 +70,11 @@ defmodule NekoAuth.User.UserManagerTest do
       assert {:ok, ^user} = UserManager.user_from_refresh_token(token)
     end
 
+    test "generates access token and resolves it", %{user: user} do
+      token = UserManager.create_access_token(user)
+      assert {:ok, ^user} = UserManager.user_from_refresh_token(token)
+    end
+
     test "generates id token", %{user: user} do
       assert is_binary(UserManager.create_id_token(user))
     end

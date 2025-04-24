@@ -87,16 +87,9 @@ end
          {:ok, user} <- user_manager().user_from_login(email, password) do
       # Ensure local session exists
       conn =
-        if fetch_cookies(conn).cookies["local_refresh_token"] == nil do
-          refresh_token = user_manager().create_refresh_token(user)
-          access_token = user_manager().create_access_token(user)
-
           conn
-          |> put_resp_cookie("local_refresh_token", refresh_token, http_only: true)
-          |> put_resp_cookie("local_access_token", access_token, http_only: true)
-        else
-          conn
-        end
+          |> put_resp_cookie("local_refresh_token",  user_manager().create_refresh_token(user), http_only: true)
+          |> put_resp_cookie("local_access_token", user_manager().create_access_token(user), http_only: true)
 
       # Validate response_type
       # IO.puts("YOU HAVE FAILED ME FOR THE FIRST TIME")

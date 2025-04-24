@@ -14,6 +14,10 @@ defmodule NekoAuthWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authorize do
+    plug  NekoAuthWeb.Plugs.IsAuthorizedPlug
+  end
+
   scope "/", NekoAuthWeb do
     pipe_through :browser
     get "/", PageController, :home
@@ -21,10 +25,17 @@ defmodule NekoAuthWeb.Router do
     get "/register", PageController, :register
   end
 
+  scope "/portal", NekoAuthWeb do
+    pipe_through [:browser, :authorize]
+    get "/", PageController, :home
+  end
   scope "/api/v1", NekoAuthWeb do
     pipe_through :api
     get "/oauth/authorize", OAuthController, :authorize
     post "/oauth/token", OAuthController, :token
+
+    get "/portal/callback", PortalController, :callback
+
     post "/register", UserController, :register
     post "/login", UserController, :login
   end
