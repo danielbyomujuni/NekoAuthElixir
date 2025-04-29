@@ -214,7 +214,7 @@ function BinaryToString(binary) {
             </form>
           </CardContent>
         </Card>
-        <Card>
+       {/*} <Card>
           <CardHeader>
             <CardTitle>Account Activity</CardTitle>
             <CardDescription>View your recent account activity.</CardDescription>
@@ -230,7 +230,7 @@ function BinaryToString(binary) {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card>*/}
       </div>
     </div>
   )
