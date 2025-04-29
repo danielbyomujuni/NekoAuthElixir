@@ -6,6 +6,7 @@ import Login from "./pages/Authentication/Login"
 import AuthenticationLayout from "./pages/Authentication/AuthLayout"
 import Register from "./pages/Authentication/Register"
 import { LayoutPortal } from "./pages/Portal/LayoutPortal"
+import HomePortal from "./pages/Portal/HomePortal"
 
 export const router = () =>
   createBrowserRouter([
@@ -33,6 +34,12 @@ export const router = () =>
         }, {
           path: "/portal",
           element: <LayoutPortal />,
+          children: [
+            {
+              path: "",
+              element: <HomePortal />
+            }
+          ]
         }
       ]
     }

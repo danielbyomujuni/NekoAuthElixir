@@ -14,6 +14,20 @@ defmodule NekoAuthWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :graphql do
+    plug NekoAuth.Context
+  end
+
+  scope "/api/graphql" do
+    pipe_through :graphql
+
+    forward "/", Absinthe.Plug,
+      schema: NekoAuthWeb.Schema
+  end
+
+
+
+
   pipeline :authorize do
     plug  NekoAuthWeb.Plugs.IsAuthorizedPlug
   end
@@ -58,6 +72,4 @@ defmodule NekoAuthWeb.Router do
     #  forward "/mailbox", Plug.Swoosh.MailboxPreview
     #end
   end
-
-  #forward "/api", Absinthe.Plug, schema: Demo.Graph.Schema
 end

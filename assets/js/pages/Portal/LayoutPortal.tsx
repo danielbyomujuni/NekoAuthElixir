@@ -1,3 +1,4 @@
+import { Sidebar } from "@/components/Sidebar"
 import { Button } from "@/components/ui/button"
 import { login } from "@/lib/neko_auth"
 import { Cat } from 'lucide-react'
@@ -17,7 +18,8 @@ export function LayoutPortal() {
           </a>
         </div>
       </header>
-      <main className="flex-1 mx-auto">
+      <main className="py-4">
+        <Sidebar />
         <Outlet />
       </main>
       <footer className="w-full border-t py-6 md:py-0 ">

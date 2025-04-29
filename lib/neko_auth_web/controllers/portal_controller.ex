@@ -1,7 +1,7 @@
 defmodule NekoAuthWeb.PortalController do
   use Phoenix.Controller, formats: [:json]
 
-  def callback(conn, %{"code" => code, "state" => state}) do
+  def callback(conn, %{"code" => code, "state" => _state}) do
     url = "#{System.get_env("HOST_NAME")}/api/v1/oauth/token"
 
     body = URI.encode_query(%{
