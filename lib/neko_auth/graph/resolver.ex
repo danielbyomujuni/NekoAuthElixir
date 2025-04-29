@@ -9,4 +9,22 @@ alias NekoAuth.Users.User
     #IO.inspect(ctx)
     {:error, "Forbidden"}
   end
+
+
+  def update_user(_parent, args, %{context: %{current_user: current_user}}) do
+    user = NekoAuth.Repo.get_by!(User, email: current_user.email)
+
+    changeset = User.changeset(user, args)
+
+    IO.inspect(args)
+
+    case NekoAuth.Repo.update(changeset) do
+      {:ok, updated_user} -> {:ok, updated_user}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def update_user(_parent, _args, _resolution) do
+    {:error, "Access denied"}
+  end
 end

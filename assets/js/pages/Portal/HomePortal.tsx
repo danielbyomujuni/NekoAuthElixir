@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import React from "react"
 import { toast } from "sonner"
 import create_client from "@/lib/apollo"
-import gql from "graphql-tag"
+import { Buffer } from 'buffer';
 // Mock user data - replace with actual data fetching in a real application
 const mockUser = {
   user_name: "John Doe",
@@ -20,6 +20,8 @@ const mockUser = {
   email: "john@example.com",
   pfp: "/placeholder.svg?height=100&width=100"
 }
+
+import { gql, useMutation } from "@apollo/client"
 
 export default function HomePortal() {
   const [user, setUser] = useState(mockUser)
@@ -52,7 +54,7 @@ export default function HomePortal() {
             descriminator: result.data.users[0].descriminator,
             email_verified: result.data.users[0].emailVerified,
             email: result.data.users[0].email,
-            pfp: "/placeholder.svg?height=100&width=100"
+            pfp: `/api/v1/avatars/${result.data.users[0].userName}/${result.data.users[0].descriminator}`
           })
         }
       })
@@ -60,13 +62,105 @@ export default function HomePortal() {
   }, [])
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    toast("Avatar updated successfully.")
+    if (!event.target.files || event.target.files.length === 0) {
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Convert file to base64
+      const base64File = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+
+      const mutation = gql`
+        mutation UpdateUserAvatar($image: Binary!) {
+          updateUser(image: $image) {
+            image
+          }
+        }
+      `;
+
+      const result = await create_client().mutate({
+        mutation,
+        variables: {
+          image: base64File
+        }
+      });
+
+
+      if (result.data.updateUser) {
+        // Update the user's avatar in the UI
+        setUser(prev => ({
+          ...prev,
+          pfp: `${base64File}`
+        }));
+        toast.success('Avatar updated successfully');
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error('Failed to update avatar');
+    } finally {
+      setIsUploading(false);
+    }
   }
+
+  function ArrayBufferToString(buffer) {
+    return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
+}
+
+function BinaryToString(binary) {
+  var error;
+
+  try {
+      return decodeURIComponent(escape(binary));
+  } catch (_error) {
+      error = _error;
+      if (error instanceof URIError) {
+          return binary;
+      } else {
+          throw error;
+      }
+  }
+}
+
+  
 
   const handleSaveChanges = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const mutation = gql`
+      mutation UpdateUserDisplayName($displayName: String!) {
+        updateUser(displayName: $displayName) {
+          displayName
+        }
+      }
+    `
+
+    create_client()
+      .mutate({
+        mutation,
+        variables: {
+          email: user.email,
+          displayName: user.display_name
+        }
+      })
+      .then((result) => {
+        toast("Changes saved successfully.")
+        console.log("Updated:", result.data.updateUser)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
     // Implement save changes logic here
-    toast("Changes saved successfully.")
   }
 
   return (
@@ -107,22 +201,12 @@ export default function HomePortal() {
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="display_name">Display Name</Label>
                   <Input
-                    id="name"
-                    placeholder="Enter your name"
-                    value={user.user_name}
-                    onChange={(e) => setUser((prev) => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={user.email}
-                    onChange={(e) => setUser((prev) => ({ ...prev, email: e.target.value }))}
+                    id="display_name"
+                    placeholder="Display Name"
+                    value={user.display_name}
+                    onChange={(e) => setUser((prev) => ({ ...prev, display_name: e.target.value }))}
                   />
                 </div>
                 <Button type="submit">Save Changes</Button>

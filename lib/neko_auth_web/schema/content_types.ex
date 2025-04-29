@@ -1,5 +1,6 @@
 defmodule NekoAuthWeb.Schema.ContentTypes do
   use Absinthe.Schema.Notation
+  import_types(NekoAuth.Schema.Types)
 
   object :user do
     field :email, :string
@@ -9,5 +10,6 @@ defmodule NekoAuthWeb.Schema.ContentTypes do
     field :password_hash, :string
     field :date_of_birth, :string
     field :email_verified, :boolean
+    field :image, :binary
   end
 end

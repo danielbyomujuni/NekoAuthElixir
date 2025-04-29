@@ -62,6 +62,7 @@ defmodule NekoAuth.MixProject do
       {:jose, "~> 1.11"},
       {:jason, "~> 1.2"},
       {:joken, "~> 2.6"},
+      {:httpoison, "~> 1.8"},
 
       # Test libs
       {:junit_formatter, "~> 3.4", only: [:test]},

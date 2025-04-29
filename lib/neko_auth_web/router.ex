@@ -60,6 +60,7 @@ defmodule NekoAuthWeb.Router do
 
     post "/register", UserController, :register
     post "/login", UserController, :login
+    get "/avatars/:user_name/:descriminator", UserController, :avatar
   end
 
 

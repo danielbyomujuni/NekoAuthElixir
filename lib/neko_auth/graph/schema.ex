@@ -5,10 +5,19 @@ defmodule NekoAuthWeb.Schema do
   alias NekoAuth.Graph.Resolver
 
   query do
-
     @desc "Get all users"
     field :users, list_of(:user) do
       resolve &Resolver.list_users/3
+    end
+  end
+
+  mutation do
+    @desc "Edit a user"
+    field :update_user, type: :user do
+      arg :display_name, :string
+      arg :image, :binary
+
+      resolve &Resolver.update_user/3
     end
 
   end
