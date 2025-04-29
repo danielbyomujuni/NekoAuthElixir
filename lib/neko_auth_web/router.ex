@@ -15,11 +15,16 @@ defmodule NekoAuthWeb.Router do
   end
 
   pipeline :graphql do
+    plug :accepts, ["json"]
     plug NekoAuth.Context
+
   end
 
   scope "/api/graphql" do
     pipe_through :graphql
+
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: NekoAuthWeb.Schema
 
     forward "/", Absinthe.Plug,
       schema: NekoAuthWeb.Schema

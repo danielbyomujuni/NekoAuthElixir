@@ -20,9 +20,9 @@ defmodule NekoAuthWeb.PortalController do
               }} <- Jason.decode(body) do
 
           conn
-          |> put_resp_cookie("portal_access_token", access_token, http_only: true)
-          |> put_resp_cookie("portal_refresh_token", refresh_token, http_only: true)
-          |> put_resp_cookie("portal_id_token", id_token, http_only: true)
+          |> put_resp_cookie("portal_access_token", access_token, http_only: false)
+          |> put_resp_cookie("portal_refresh_token", refresh_token,  http_only: false)
+          |> put_resp_cookie("portal_id_token", id_token,  http_only: false)
           |> put_resp_header("location", "/portal")
           |> send_resp(302, "Redirecting to portal page...")
         else
