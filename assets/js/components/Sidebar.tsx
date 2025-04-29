@@ -48,7 +48,7 @@ function NavItem({ item }: { item: (typeof navItems)[number] }) {
 export function Sidebar() {
   return (
     <TooltipProvider>
-      <aside className="absolute left-0 top-13 z-10 bottom-0 h-full w-16 py-4 flex flex-col border-r border-zinc-800">
+      <aside className="absolute left-0 top-13 z-10 bottom-24 w-16 py-4 flex flex-col border-r border-zinc-800">
         <div className="flex-1 flex flex-col items-center gap-4 py-4">
           {
 navItems.map((item) => (

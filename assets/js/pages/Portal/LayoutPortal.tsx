@@ -18,7 +18,7 @@ export function LayoutPortal() {
           </a>
         </div>
       </header>
-      <main className="py-4">
+      <main className="py-4 mb-auto">
         <Sidebar />
         <Outlet />
       </main>
