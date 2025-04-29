@@ -17,7 +17,10 @@ defmodule NekoAuthWeb.Router do
   pipeline :graphql do
     plug :accepts, ["json"]
     plug NekoAuth.Context
-
+    plug Plug.Parsers,
+      parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
+      pass: ["*/*"],
+      json_decoder: Jason
   end
 
   scope "/api/graphql" do

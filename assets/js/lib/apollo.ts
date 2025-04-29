@@ -23,7 +23,6 @@ export default function create_client() {
 
   const httpLink = new HttpLink({
     uri: "http://localhost:4050/api/graphql",
-    useGETForQueries: true,
     credentials: "include" // keep this if backend needs cookies for other reasons
   })
 
