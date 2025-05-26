@@ -2,7 +2,10 @@ defmodule NekoAuthWeb.Schema do
   use Absinthe.Schema
   import_types NekoAuthWeb.Schema.ContentTypes
 
+
   alias NekoAuth.Graph.Resolver
+
+  @service_schema Absinthe.Plug.init(schema: NekoAuthWeb.Schema.Services)
 
   query do
     @desc "Get all users"
