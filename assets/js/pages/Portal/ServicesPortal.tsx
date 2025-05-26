@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -36,68 +36,7 @@ import {
   Shield,
 } from "lucide-react"
 import React from "react"
-import { createService } from "@/lib/graph/services"
-
-interface OAuthService {
-  id: string
-  name: string
-  clientId: string
-  clientSecret?: string
-  secretGenerated: boolean
-  description: string
-  redirectUris: string[]
-  scopes: string[]
-  applicationType: string
-  status: "active" | "inactive"
-  emailRestrictionType: "none" | "whitelist" | "blacklist"
-  restrictedEmails: string[]
-  createdAt: string
-}
-
-const mockServices: OAuthService[] = [
-  {
-    id: "1",
-    name: "My Web App",
-    clientId: "web_app_client_123",
-    secretGenerated: false,
-    description: "Main web application for user authentication",
-    redirectUris: ["https://myapp.com/callback", "http://localhost:3000/callback"],
-    scopes: ["read", "write", "profile"],
-    applicationType: "web",
-    status: "active",
-    emailRestrictionType: "whitelist",
-    restrictedEmails: ["admin@myapp.com", "user@myapp.com"],
-    createdAt: "2024-01-15",
-  },
-  {
-    id: "2",
-    name: "Mobile App",
-    clientId: "mobile_client_456",
-    secretGenerated: false,
-    description: "iOS and Android mobile application",
-    redirectUris: ["myapp://callback"],
-    scopes: ["read", "profile"],
-    applicationType: "mobile",
-    status: "active",
-    emailRestrictionType: "blacklist",
-    restrictedEmails: ["spam@example.com", "test@blocked.com"],
-    createdAt: "2024-01-10",
-  },
-  {
-    id: "3",
-    name: "Analytics Dashboard",
-    clientId: "analytics_789",
-    secretGenerated: false,
-    description: "Internal analytics and reporting dashboard",
-    redirectUris: ["https://analytics.myapp.com/auth"],
-    scopes: ["read", "analytics"],
-    applicationType: "web",
-    status: "inactive",
-    emailRestrictionType: "none",
-    restrictedEmails: [],
-    createdAt: "2024-01-05",
-  },
-]
+import { createService, getServices, OAuthService } from "@/lib/graph/services"
 
 const availableScopes = [
   { id: "read", label: "Read", description: "Read access to user data" },
@@ -109,7 +48,7 @@ const availableScopes = [
 ]
 
 export default function ServicesPortal() {
-  const [services, setServices] = useState<OAuthService[]>(mockServices)
+  const [services, setServices] = useState<OAuthService[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingService, setEditingService] = useState<OAuthService | null>(null)
@@ -136,6 +75,12 @@ export default function ServicesPortal() {
       restrictedEmails: "",
     })
   }
+
+  useEffect(() => {
+    getServices().then((fetchedServices) => {
+      setServices(fetchedServices)
+    });
+  },[]);
 
   const populateFormData = (service: OAuthService) => {
     setFormData({
@@ -165,11 +110,15 @@ export default function ServicesPortal() {
       createdAt: new Date().toISOString().split("T")[0],
     }
 
+    createService({...formData, 
+      status: true, 
+      redirectUris: formData.redirectUris.split("\n").filter((uri) => uri.trim()), 
+      restrictedEmails: formData.restrictedEmails.split("\n").filter((email) => email.trim())
+    });
+
     setServices([...services, newService])
     setIsCreateDialogOpen(false)
     resetFormData()
-
-    createService();
   }
 
   const handleEditService = () => {

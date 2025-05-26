@@ -1,45 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql } from "@apollo/client"
 import Cookies from 'js-cookie';
 
-const typeDefs = gql`
-  scalar DateTime
-
-  type Service {
-    id: ID!
-    name: String!
-    description: String!
-    url: String!
-    iconUrl: String
-    createdAt: DateTime!
-    updatedAt: DateTime!
-    redirectUris: [String!]!
-    scopes: [String!]!
-    applicationType: String!
-    status: Boolean!
-    emailRestrictionType: String!
-    restrictedEmails: [String!]!
-    ownerEmail: String!
-    plainClientSecret: String
-  }
-
-  input CreateServiceInput {
-    name: String!
-    description: String!
-    url: String!
-    iconUrl: String
-    redirectUris: [String!]!
-    scopes: [String!]!
-    applicationType: String!
-    status: Boolean!
-    emailRestrictionType: String!
-    restrictedEmails: [String!]!
-  }
-
-  type Mutation {
-    createService(input: CreateServiceInput!): Service!
-  }
-`;
-
 function getAuthTokenFromCookie() {
   return Cookies.get('portal_access_token')
 }
@@ -63,7 +24,7 @@ export default function create_client() {
   })
 
   return new ApolloClient({
-    typeDefs,
+    //typeDefs,
     link: authLink.concat(httpLink),
     cache: new InMemoryCache()
   })

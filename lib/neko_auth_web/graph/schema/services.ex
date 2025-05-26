@@ -45,6 +45,8 @@ defmodule NekoAuthWeb.Schema.Services do
     field :email_restriction_type, :string
     field :restricted_emails, list_of(:string)
     field :owner_email, :string
+
+    field :plain_client_secret, :string
   end
 
 
