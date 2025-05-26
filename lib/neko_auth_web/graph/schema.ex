@@ -1,11 +1,10 @@
 defmodule NekoAuthWeb.Schema do
   use Absinthe.Schema
+  import_types NekoAuthWeb.Schema.Services
   import_types NekoAuthWeb.Schema.ContentTypes
 
 
   alias NekoAuth.Graph.Resolver
-
-  @service_schema Absinthe.Plug.init(schema: NekoAuthWeb.Schema.Services)
 
   query do
     @desc "Get all users"
@@ -15,6 +14,8 @@ defmodule NekoAuthWeb.Schema do
   end
 
   mutation do
+    import_fields :create_service_mutations
+
     @desc "Edit a user"
     field :update_user, type: :user do
       arg :display_name, :string

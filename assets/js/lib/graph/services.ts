@@ -18,25 +18,36 @@ export interface OAuthService {
     createdAt: string
   }
 
-const GET_SERVICES_QUERY = gql`
-{
-            services {
-              dateOfBirth
-              descriminator
-              displayName
-              email
-              emailVerified
-              userName
-            }
-          }
-`
+const CREATE_SERVICE_MUTATION = gql`
+  mutation CreateService($input: CreateServiceInput!) {
+  createService(input: $input) {
+    id
+    name
+    ownerEmail
+  }
+}
+`;
 
+export async function createService() {
 
-export async function getServices() {
+  const variables = {
+    input: {
+      name: "My App",
+      description: "A test app",
+      url: "https://myapp.com",
+      iconUrl: "https://myapp.com/icon.png",
+      redirectUris: ["https://myapp.com/callback"],
+      scopes: ["read", "write"],
+      applicationType: "web",
+      status: true,
+      emailRestrictionType: "none",
+      restrictedEmails: []
+    }
+  };
     
         return await create_client()
-          .query({
-            query: GET_SERVICES_QUERY,
-            variables: undefined
+          .mutate({
+            mutation: CREATE_SERVICE_MUTATION,
+            variables: variables
           })
 }

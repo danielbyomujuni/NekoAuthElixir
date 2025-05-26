@@ -36,6 +36,7 @@ import {
   Shield,
 } from "lucide-react"
 import React from "react"
+import { createService } from "@/lib/graph/services"
 
 interface OAuthService {
   id: string
@@ -167,6 +168,8 @@ export default function ServicesPortal() {
     setServices([...services, newService])
     setIsCreateDialogOpen(false)
     resetFormData()
+
+    createService();
   }
 
   const handleEditService = () => {
