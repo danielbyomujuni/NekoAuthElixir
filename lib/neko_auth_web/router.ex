@@ -50,6 +50,7 @@ defmodule NekoAuthWeb.Router do
   scope "/portal", NekoAuthWeb do
     pipe_through [:browser, :authorize]
     get "/", PageController, :home
+    get "/services", PageController, :home
   end
   scope "/api/v1", NekoAuthWeb do
     pipe_through :api

@@ -114,11 +114,11 @@ export default function HomePortal() {
     }
   }
 
-  function ArrayBufferToString(buffer) {
+  function ArrayBufferToString(buffer: any) {
     return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
 }
 
-function BinaryToString(binary) {
+function BinaryToString(binary: string) {
   var error;
 
   try {

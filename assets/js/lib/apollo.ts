@@ -8,9 +8,6 @@ function getAuthTokenFromCookie() {
 export default function create_client() {
   const authLink = new ApolloLink((operation, forward) => {
     const token = getAuthTokenFromCookie()
-
-    console.log("Token: ", token)
-
     operation.setContext(({ headers = {} }) => ({
       headers: {
         ...headers,

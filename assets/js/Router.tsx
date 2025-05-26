@@ -7,6 +7,7 @@ import AuthenticationLayout from "./pages/Authentication/AuthLayout"
 import Register from "./pages/Authentication/Register"
 import { LayoutPortal } from "./pages/Portal/LayoutPortal"
 import HomePortal from "./pages/Portal/HomePortal"
+import ServicesPortal from "./pages/Portal/ServicesPortal"
 
 export const router = () =>
   createBrowserRouter([
@@ -38,6 +39,10 @@ export const router = () =>
             {
               path: "",
               element: <HomePortal />
+            },
+            {
+              path: "services",
+              element: <ServicesPortal />
             }
           ]
         }

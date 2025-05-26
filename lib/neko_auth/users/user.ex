@@ -17,6 +17,6 @@ defmodule NekoAuth.Users.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:email, :display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified, :image])
-    |> validate_required([:email, :display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified, :image])
+    |> validate_required([:email, :display_name, :user_name, :descriminator, :password_hash, :date_of_birth, :email_verified])
   end
 end
