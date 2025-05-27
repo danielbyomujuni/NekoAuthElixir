@@ -73,17 +73,13 @@ build-container:
     - when: never
   needs:
     - test
-  image: 
-    name: gcr.io/kaniko-project/executor:v1.14.0-debug
-    entrypoint: [""]
-  tags:
-    - build-container
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
   script:
-    - /kaniko/executor
-      --context "${CI_PROJECT_DIR}"
-      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
-      --destination "${CI_REGISTRY_IMAGE}:latest"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - docker build -t $CI_REGISTRY/neko-syndicate/neko-auth-elixir:latest .
+    - docker push $CI_REGISTRY/neko-syndicate/neko-auth-elixir:latest
 
 deploy-container:
   stage: deploy
