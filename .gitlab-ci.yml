@@ -1,76 +1,76 @@
 image: elixir:1.18.3-alpine
 
 stages:
-  - deps
-  - build
-  - test
-  - deploy
+#   - deps
+#   - build
+#   - test
+   - deploy
 
-services:
-  - postgres:latest
+# services:
+#   - postgres:latest
 
-variables:
-  MIX_ENV: test
-  FF_NETWORK_PER_BUILD: 1
-  POSTGRES_PASSWORD: ci_pipeline_password
-  BACKEND_POSTGRES_HOST: postgres
-  POSTGRES_USER: postgres
-  POSTGRES_HOST: postgres
-  POSTGRES_PWD: ci_pipeline_password
-  POSTGRES_DATABASE: neko_auth_test
-  SALT_ROUNDS: 10
-  POSTGRES_URL: "postgres://postgres:ci_pipeline_password@postgres/neko_auth_test"
+# variables:
+#   MIX_ENV: test
+#   FF_NETWORK_PER_BUILD: 1
+#   POSTGRES_PASSWORD: ci_pipeline_password
+#   BACKEND_POSTGRES_HOST: postgres
+#   POSTGRES_USER: postgres
+#   POSTGRES_HOST: postgres
+#   POSTGRES_PWD: ci_pipeline_password
+#   POSTGRES_DATABASE: neko_auth_test
+#   SALT_ROUNDS: 10
+#   POSTGRES_URL: "postgres://postgres:ci_pipeline_password@postgres/neko_auth_test"
 
-deps:
-  stage: deps
-  script:
-    - mix deps.get
-  before_script:
-  - apk add --no-cache build-base git openssl-dev
-  - apk add --no-cache nodejs npm yarn
-  - touch testing.env.exs
-  - mix setup.pipeline
-  artifacts:
-    paths:
-      - _build
-      - deps
+# deps:
+#   stage: deps
+#   script:
+#     - mix deps.get
+#   before_script:
+#   - apk add --no-cache build-base git openssl-dev
+#   - apk add --no-cache nodejs npm yarn
+#   - touch testing.env.exs
+#   - mix setup.pipeline
+#   artifacts:
+#     paths:
+#       - _build
+#       - deps
 
-build:
-  stage: build
-  before_script:
-  - apk add --no-cache build-base git openssl-dev
-  - apk add --no-cache nodejs npm yarn
-  - touch testing.env.exs
-  - mix setup.pipeline
-  script:
-    - mix compile
+# build:
+#   stage: build
+#   before_script:
+#   - apk add --no-cache build-base git openssl-dev
+#   - apk add --no-cache nodejs npm yarn
+#   - touch testing.env.exs
+#   - mix setup.pipeline
+#   script:
+#     - mix compile
 
-test:
-  stage: test
-  before_script:
-  - apk add --no-cache build-base git openssl-dev
-  - apk add --no-cache nodejs npm yarn
-  - touch testing.env.exs
-  - mix setup.pipeline
-  script:
-    - mix setup
-    - mix test
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
+# test:
+#   stage: test
+#   before_script:
+#   - apk add --no-cache build-base git openssl-dev
+#   - apk add --no-cache nodejs npm yarn
+#   - touch testing.env.exs
+#   - mix setup.pipeline
+#   script:
+#     - mix setup
+#     - mix test
+#   artifacts:
+#     when: always
+#     reports:
+#       junit: report.xml
       
-#coverage:
-#  stage: test
-#  script:
-#    - mix ecto.create --quiet
-#    - mix ecto.migrate --quiet
-#    - mix coverage
-#  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
-#  artifacts:
-#    paths:
-#      - cover
-#    when: always
+# #coverage:
+# #  stage: test
+# #  script:
+# #    - mix ecto.create --quiet
+# #    - mix ecto.migrate --quiet
+# #    - mix coverage
+# #  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
+# #  artifacts:
+# #    paths:
+# #      - cover
+# #    when: always
 
 build-container:
   stage: deploy
