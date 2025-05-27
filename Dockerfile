@@ -57,6 +57,10 @@ FROM ${RUNNER_IMAGE}
 
 
 WORKDIR "/app"
+
+RUN mix local.hex --force && \
+  mix local.rebar --force
+  
 RUN chown neko /app
 
 # set runner ENV
