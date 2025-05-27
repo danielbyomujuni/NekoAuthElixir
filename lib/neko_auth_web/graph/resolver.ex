@@ -5,7 +5,7 @@ alias NekoAuth.Users.User
     {:ok, NekoAuth.Repo.get(User, current_user.email)}
   end
 
-  def list_users(_parent, _args, ctx) do
+  def list_users(_parent, _args, _ctx) do
     #IO.inspect(ctx)
     {:error, "Forbidden"}
   end
