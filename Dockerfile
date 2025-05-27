@@ -52,7 +52,6 @@ COPY config/runtime.exs config/
 
 RUN mix release
 RUN ls _build/prod
-RUN ls /builds/neko-syndicate/neko-auth-elixir/_build/prod/
 RUN ls /app/_build/prod
 
 COPY /app_build/${MIX_ENV}/rel /app_build/${MIX_ENV}/rel
