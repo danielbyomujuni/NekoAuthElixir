@@ -53,17 +53,17 @@ test:
     reports:
       junit: report.xml
       
-coverage:
-  stage: test
-  script:
-    - mix ecto.create --quiet
-    - mix ecto.migrate --quiet
-    - mix coverage
-  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
-  artifacts:
-    paths:
-      - cover
-    when: always
+#coverage:
+#  stage: test
+#  script:
+#    - mix ecto.create --quiet
+#    - mix ecto.migrate --quiet
+#    - mix coverage
+#  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
+#  artifacts:
+#    paths:
+#      - cover
+#    when: always
 
 build-container:
   stage: deploy
@@ -71,9 +71,8 @@ build-container:
     - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"' # && $CI_COMMIT_BRANCH == "main"
       when: always
     - when: never
-#  needs:
-#    - test_autograder
-#    - test_webapp
+  needs:
+    - test
   image: 
     name: gcr.io/kaniko-project/executor:v1.14.0-debug
     entrypoint: [""]
@@ -81,10 +80,10 @@ build-container:
     - build-container
   script:
     - /kaniko/executor
-      --context "${CI_PROJECT_DIR}/web_app/"
-      --dockerfile "${CI_PROJECT_DIR}/web_app/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}/web_app:${CI_COMMIT_SHORT_SHA}"
-      --destination "${CI_REGISTRY_IMAGE}/web_app:latest"
+      --context "${CI_PROJECT_DIR}/"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:latest"
 
 deploy-container:
   stage: deploy
