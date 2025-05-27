@@ -51,6 +51,7 @@ RUN mix compile
 COPY config/runtime.exs config/
 
 RUN mix release
+RUN ls
 COPY _build/${MIX_ENV}/rel _build/${MIX_ENV}/rel
 
 # start a new build stage so that the final image will only contain
