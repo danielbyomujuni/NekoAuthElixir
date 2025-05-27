@@ -18,6 +18,9 @@ RUN npm install -g yarn
 # prepare build dir
 WORKDIR /app
 
+RUN mix local.hex --force && \
+  mix local.rebar --force
+
 # set build ENV
 ENV MIX_ENV="prod"
 
@@ -58,9 +61,7 @@ FROM ${RUNNER_IMAGE}
 
 WORKDIR "/app"
 
-RUN mix local.hex --force && \
-  mix local.rebar --force
-  
+
 RUN chown neko /app
 
 # set runner ENV
