@@ -13,7 +13,7 @@ services:
       - '5007:5432'
     networks:
       - neko_auth_stack
-  gitlab:
+  main:
     image: registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
     env_file: ./prod.env
     depends_on:

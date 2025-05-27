@@ -38,3 +38,4 @@ npm-debug.log
 *.env.exs
 !pipeline.env.exs
 
+prod.env
