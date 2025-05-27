@@ -78,8 +78,8 @@ build-container:
     - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"' # && $CI_COMMIT_BRANCH == "main"
       when: always
     - when: never
-  needs:
-    - test
+#  needs:
+#    - test
   image: 
     name: gcr.io/kaniko-project/executor:v1.14.0-debug
     entrypoint: [""]
