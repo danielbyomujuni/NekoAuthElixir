@@ -22,6 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   Copy,
   Eye,
@@ -34,9 +35,11 @@ import {
   Key,
   Mail,
   Shield,
+  Calendar,
+  Globe,
 } from "lucide-react"
 import React from "react"
-import { createService, getServices, OAuthService } from "@/lib/graph/services"
+import { createService, deleteService, generateNewServiceSecret, getServices, OAuthService } from "@/lib/graph/services"
 
 const availableScopes = [
   { id: "read", label: "Read", description: "Read access to user data" },
@@ -94,27 +97,34 @@ export default function ServicesPortal() {
     })
   }
 
-  const handleCreateService = () => {
-    const newService: OAuthService = {
+  const handleCreateService = async () => {
+    let newService: OAuthService = {
       id: Date.now().toString(),
       name: formData.name,
-      clientId: `client_${Date.now()}`,
       secretGenerated: false,
       description: formData.description,
       redirectUris: formData.redirectUris.split("\n").filter((uri) => uri.trim()),
       scopes: formData.scopes,
       applicationType: formData.applicationType,
-      status: "active",
+      status: true,
       emailRestrictionType: formData.emailRestrictionType,
       restrictedEmails: formData.restrictedEmails.split("\n").filter((email) => email.trim()),
       createdAt: new Date().toISOString().split("T")[0],
     }
 
-    createService({...formData, 
+    const res = await createService({...formData, 
       status: true, 
       redirectUris: formData.redirectUris.split("\n").filter((uri) => uri.trim()), 
       restrictedEmails: formData.restrictedEmails.split("\n").filter((email) => email.trim())
     });
+
+    console.log("Service created:", res);
+
+    newService.id = res.id;
+    newService.clientSecret = res.plainClientSecret || "Generated";
+    newService.secretGenerated = true;
+
+    console.log("Service loaded:", newService);
 
     setServices([...services, newService])
     setIsCreateDialogOpen(false)
@@ -147,8 +157,9 @@ export default function ServicesPortal() {
     setIsEditDialogOpen(true)
   }
 
-  const generateSecret = (serviceId: string) => {
-    const newSecret = `secret_${Math.random().toString(36).substring(2)}_${Date.now()}`
+  const generateSecret = async (serviceId: string) => {
+    const newSecret = await generateNewServiceSecret(serviceId);
+    console.log("New secret generated:", newSecret);
 
     setServices((prev) =>
       prev.map((service) =>
@@ -160,8 +171,8 @@ export default function ServicesPortal() {
     setShowSecrets((prev) => ({ ...prev, [serviceId]: true }))
   }
 
-  const regenerateSecret = (serviceId: string) => {
-    const newSecret = `secret_${Math.random().toString(36).substring(2)}_${Date.now()}`
+  const regenerateSecret = async (serviceId: string) => {
+    const newSecret = await generateNewServiceSecret(serviceId);
 
     setServices((prev) =>
       prev.map((service) => (service.id === serviceId ? { ...service, clientSecret: newSecret } : service)),
@@ -189,7 +200,8 @@ export default function ServicesPortal() {
     }))
   }
 
-  const deleteService = (serviceId: string) => {
+  const handleDeleteService = (serviceId: string) => {
+    deleteService(serviceId)
     setServices(services.filter((service) => service.id !== serviceId))
   }
 
@@ -546,106 +558,149 @@ export default function ServicesPortal() {
             {services.length} service{services.length !== 1 ? "s" : ""} configured
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Client ID</TableHead>
-                <TableHead>Client Secret</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Scopes</TableHead>
-                <TableHead>Email Restrictions</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {services.map((service) => (
-                <TableRow key={service.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{service.name}</div>
-                      <div className="text-sm text-muted-foreground">{service.description}</div>
+        <CardContent className="p-0">
+          <Accordion type="multiple" className="w-full">
+            {services.map((service) => (
+              <AccordionItem key={service.id} value={service.id} className="border-b last:border-b-0">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex items-center justify-between w-full mr-4">
+                    <div className="flex items-center gap-4">
+                      <div className="text-left">
+                        <div className="font-medium">{service.name}</div>
+                        <div className="text-sm text-muted-foreground">{service.description}</div>
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
                     <div className="flex items-center gap-2">
-                      <code className="text-sm bg-muted px-2 py-1 rounded">{service.clientId}</code>
-                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(service.clientId)}>
-                        <Copy className="h-3 w-3" />
-                      </Button>
+                      <Badge variant={service.status ? "default" : "secondary"}>{service.status ? "active" : "secondary"}</Badge>
+                      <Badge variant="outline">{service.applicationType}</Badge>
+                      {getEmailRestrictionBadge(service)}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {!service.secretGenerated ? (
-                      <Button variant="outline" size="sm" onClick={() => generateSecret(service.id)}>
-                        <Key className="mr-2 h-3 w-3" />
-                        Generate Secret
-                      </Button>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <code className="text-sm bg-muted px-2 py-1 rounded">
-                          {showSecrets[service.id] ? service.clientSecret : "••••••••••••"}
-                        </code>
-                        <Button variant="ghost" size="sm" onClick={() => toggleSecretVisibility(service.id)}>
-                          {showSecrets[service.id] ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                        </Button>
-                        {showSecrets[service.id] && (
-                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(service.clientSecret!)}>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {/* Client Credentials */}
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium">Client ID</Label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <code className="text-sm bg-muted px-2 py-1 rounded flex-1 break-all">
+                            {service.id}
+                          </code>
+                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(service.id)}>
                             <Copy className="h-3 w-3" />
                           </Button>
-                        )}
+                        </div>
                       </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{service.applicationType}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={service.status === "active" ? "default" : "secondary"}>{service.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {service.scopes.map((scope) => (
-                        <Badge key={scope} variant="outline" className="text-xs">
-                          {scope}
-                        </Badge>
-                      ))}
+
+                      <div>
+                        <Label className="text-sm font-medium">Client Secret</Label>
+                        <div className="mt-1">
+                          {!service.secretGenerated ? (
+                            <Button variant="outline" size="sm" onClick={() => generateSecret(service.id)}>
+                              <Key className="mr-2 h-3 w-3" />
+                              Generate Secret
+                            </Button>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <code className="text-sm bg-muted px-2 py-1 rounded flex-1">
+                                {showSecrets[service.id] ? service.clientSecret : "••••••••••••"}
+                              </code>
+                              <Button variant="ghost" size="sm" onClick={() => toggleSecretVisibility(service.id)}>
+                                {showSecrets[service.id] ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                              </Button>
+                              {showSecrets[service.id] && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(service.clientSecret!)}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium">Created</Label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{service.createdAt}</span>
+                        </div>
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell>{getEmailRestrictionBadge(service)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{service.createdAt}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => openEditDialog(service)}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        {service.secretGenerated && (
-                          <DropdownMenuItem onClick={() => regenerateSecret(service.id)}>
-                            <Key className="mr-2 h-4 w-4" />
-                            Regenerate Secret
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem className="text-destructive" onClick={() => deleteService(service.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+
+                    {/* Configuration Details */}
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium">Scopes</Label>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {service.scopes.map((scope) => (
+                            <Badge key={scope} variant="outline" className="text-xs">
+                              {scope}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium">Redirect URIs</Label>
+                        <div className="space-y-1 mt-1">
+                          {service.redirectUris.map((uri, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                              <code className="text-xs bg-muted px-1 py-0.5 rounded break-all">{uri}</code>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {service.emailRestrictionType !== "none" && (
+                        <div>
+                          <Label className="text-sm font-medium">
+                            {service.emailRestrictionType === "whitelist" ? "Allowed Emails" : "Blocked Emails"}
+                          </Label>
+                          <div className="space-y-1 mt-1">
+                            {service.restrictedEmails.map((email, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                <span className="text-xs">{email}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 mt-6 pt-4 border-t">
+                    <Button variant="outline" size="sm" onClick={() => openEditDialog(service)}>
+                      <Settings className="mr-2 h-3 w-3" />
+                      Edit
+                    </Button>
+                    {service.secretGenerated && (
+                      <Button variant="outline" size="sm" onClick={() => regenerateSecret(service.id)}>
+                        <Key className="mr-2 h-3 w-3" />
+                        Regenerate Secret
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleDeleteService(service.id)}
+                    >
+                      <Trash2 className="mr-2 h-3 w-3" />
+                      Delete
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
     </div>

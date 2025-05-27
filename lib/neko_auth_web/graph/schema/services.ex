@@ -50,10 +50,37 @@ defmodule NekoAuthWeb.Schema.Services do
   end
 
 
-  object :create_service_mutations do
+  object :service_mutations do
     field :create_service, type: :service do
       arg :input, non_null(:create_service_input)
       resolve &ServiceResolver.create_service/3
+    end
+
+    field :delete_service, type: :service do
+      arg :id, non_null(:id)
+      resolve &ServiceResolver.delete_service/3
+    end
+
+    field :update_service, type: :service do
+      arg :id, non_null(:id)
+      arg :name, :string
+      arg :description, :string
+      arg :redirect_uris, list_of(:string)
+      arg :scopes, list_of(:string)
+      arg :application_type, :string
+      arg :status, :boolean
+      arg :email_restriction_type, :string
+      arg :restricted_emails, list_of(:string)
+
+      arg :client_secret, :boolean
+
+      resolve &ServiceResolver.update_service/3
+    end
+  end
+
+  object :service_query do
+    field :services, type: list_of(:service) do
+      resolve &ServiceResolver.get_services/3
     end
   end
 

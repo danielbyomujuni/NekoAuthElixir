@@ -28,9 +28,9 @@ defmodule NekoAuthWeb.Plugs.IsAuthorizedPlug do
     end
   end
 
-  defp verify_access_token(nil), do: {:error, :missing}
+  defp verify_access_token(nil), do: {:error, :unauthorized}
   defp verify_access_token(token), do: UserManager.user_from_refresh_token(token)
 
-  defp verify_refresh_token(nil), do: {:error, :missing}
+  defp verify_refresh_token(nil), do: {:error, :unauthorized}
   defp verify_refresh_token(token), do: UserManager.user_from_refresh_token(token)
 end

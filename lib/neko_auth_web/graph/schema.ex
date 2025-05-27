@@ -7,6 +7,8 @@ defmodule NekoAuthWeb.Schema do
   alias NekoAuth.Graph.Resolver
 
   query do
+    import_fields :service_query
+
     @desc "Get all users"
     field :users, list_of(:user) do
       resolve &Resolver.list_users/3
@@ -14,7 +16,7 @@ defmodule NekoAuthWeb.Schema do
   end
 
   mutation do
-    import_fields :create_service_mutations
+    import_fields :service_mutations
 
     @desc "Edit a user"
     field :update_user, type: :user do
