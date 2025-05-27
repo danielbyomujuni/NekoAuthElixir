@@ -51,7 +51,9 @@ RUN mix compile
 COPY config/runtime.exs config/
 
 RUN mix release
-RUN ls _build
+RUN ls _build/prod
+RUN ls /builds/neko-syndicate/neko-auth-elixir/_build/prod/
+
 COPY _build/${MIX_ENV}/rel _build/${MIX_ENV}/rel
 
 # start a new build stage so that the final image will only contain
