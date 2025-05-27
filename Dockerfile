@@ -1,6 +1,6 @@
-ARG ELIXIR_VERSION=1.13.4
-ARG OTP_VERSION=22.1.8.1
-ARG DEBIAN_VERSION=bullseye-20250520-slim
+ARG ELIXIR_VERSION=1.18.3
+ARG OTP_VERSION=25.3.2.21
+ARG DEBIAN_VERSION=buster-20240612-slim
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
@@ -26,7 +26,7 @@ ENV MIX_ENV="prod"
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
-RUN mix deps.get
+RUN mix deps.get --only $MIX_ENV
 RUN mkdir config
 
 COPY config/config.exs config/${MIX_ENV}.exs config/
