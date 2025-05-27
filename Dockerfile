@@ -53,8 +53,9 @@ COPY config/runtime.exs config/
 RUN mix release
 RUN ls _build/prod
 RUN ls /builds/neko-syndicate/neko-auth-elixir/_build/prod/
+RUN ls /app/_build/prod
 
-COPY _build/${MIX_ENV}/rel _build/${MIX_ENV}/rel
+COPY /app_build/${MIX_ENV}/rel /app_build/${MIX_ENV}/rel
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
@@ -70,7 +71,7 @@ RUN chown neko /app
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=neko:root /app/_build/${MIX_ENV}/rel/super ./
+COPY --from=builder --chown=neko:root /app/_build/${MIX_ENV}/rel/neko_auth ./
 
 USER neko
 
