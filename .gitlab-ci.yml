@@ -21,18 +21,15 @@ variables:
   SALT_ROUNDS: 10
   POSTGRES_URL: "postgres://postgres:ci_pipeline_password@postgres/neko_auth_test"
 
-
-# Install Node.js for assets
-before_script:
-  - apk add --no-cache build-base git openssl-dev
-  - apk add --no-cache nodejs npm yarn
-  - touch testing.env.exs
-  - mix setup.pipeline
-
 deps:
   stage: deps
   script:
     - mix deps.get
+  before_script:
+  - apk add --no-cache build-base git openssl-dev
+  - apk add --no-cache nodejs npm yarn
+  - touch testing.env.exs
+  - mix setup.pipeline
   artifacts:
     paths:
       - _build
@@ -40,11 +37,21 @@ deps:
 
 build:
   stage: build
+  before_script:
+  - apk add --no-cache build-base git openssl-dev
+  - apk add --no-cache nodejs npm yarn
+  - touch testing.env.exs
+  - mix setup.pipeline
   script:
     - mix compile
 
 test:
   stage: test
+  before_script:
+  - apk add --no-cache build-base git openssl-dev
+  - apk add --no-cache nodejs npm yarn
+  - touch testing.env.exs
+  - mix setup.pipeline
   script:
     - mix setup
     - mix test
