@@ -62,13 +62,13 @@ FROM ${RUNNER_IMAGE}
 WORKDIR "/app"
 
 
-RUN chown neko /app
+RUN chown nobody /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=neko:root /app/_build/${MIX_ENV}/rel/neko_auth ./
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/neko_auth ./
 
 USER neko
 
