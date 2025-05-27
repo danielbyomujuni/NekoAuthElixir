@@ -76,8 +76,7 @@ build-container:
   stage: deploy
   rules:
     - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"' # && $CI_COMMIT_BRANCH == "main"
-      when: always
-      allow_failure: false
+      when: on_success
     - when: never
 #  needs:
 #    - test
@@ -97,8 +96,7 @@ deploy-container:
   stage: deploy
   rules:
     - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"'
-      when: always
-      allow_failure: false
+      when: on_success
     - when: never
   needs:
     - build-container
