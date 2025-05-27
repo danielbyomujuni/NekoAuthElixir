@@ -4,6 +4,7 @@ stages:
   - deps
   - build
   - test
+  - deploy
 
 services:
   - postgres:latest
@@ -18,6 +19,7 @@ variables:
   POSTGRES_PWD: ci_pipeline_password
   POSTGRES_DATABASE: neko_auth_test
   SALT_ROUNDS: 10
+  POSTGRES_URL: "postgres://postgres:ci_pipeline_password@postgres/neko_auth_test"
 
 
 # Install Node.js for assets
@@ -62,3 +64,52 @@ coverage:
     paths:
       - cover
     when: always
+
+build-container:
+  stage: deploy
+  rules:
+    - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"' # && $CI_COMMIT_BRANCH == "main"
+      when: always
+    - when: never
+#  needs:
+#    - test_autograder
+#    - test_webapp
+  image: 
+    name: gcr.io/kaniko-project/executor:v1.14.0-debug
+    entrypoint: [""]
+  tags:
+    - build-container
+  script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}/web_app/"
+      --dockerfile "${CI_PROJECT_DIR}/web_app/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}/web_app:${CI_COMMIT_SHORT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}/web_app:latest"
+
+deploy-container:
+  stage: deploy
+  rules:
+
+    - if: '$CI_SERVER_URL =~ /^https?:\/\/gitlab\.nekosyndicate\.com(\/|$)/ && $CI_COMMIT_BRANCH == "main"'
+      when: always
+
+    - when: never
+  needs:
+    - build-container
+  image: registry.gitlab.nekosyndicate.com/danielb/dockerfiles/debian-docker:44464b5d
+  before_script:
+    #GET SSH KEYS
+    - mkdir -p /root/.ssh/
+    - chmod 700 ~/.ssh
+    - eval $(ssh-agent -s)
+    - chmod 400 "$SSH_KEY"
+    - ssh-add "$SSH_KEY"
+    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+    - cd $CI_PROJECT_DIR
+    - unset DOCKER_HOST
+  script:
+      - cp $PROD_ENV prod.env
+      - docker context create neko_auth --docker "host=ssh://$SSH_USER@$SSH_HOST"
+      - docker context use neko_auth
+      - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+      - docker stack deploy --with-registry-auth --detach=true --compose-file ./docker-compose.yml neko_auth

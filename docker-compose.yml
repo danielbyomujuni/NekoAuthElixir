@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:17.5
+    env_file: ./prod.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - /srv/neko_auth/db:/var/lib/postgresql/data
+    ports:
+      - '5007:5432'
+    networks:
+      - neko_auth_stack
+  gitlab:
+    image: registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
+    env_file: ./prod.env
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - AUTH_TRUST_HOST=true
+    ports:
+      - '5006:3000'
+    networks:
+      - neko_auth_stack
+networks:
+  coursesail_stack:
+    name: neko_auth_stack
+    driver: overlay
