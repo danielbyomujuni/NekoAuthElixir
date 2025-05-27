@@ -26,6 +26,6 @@ services:
     networks:
       - neko_auth_stack
 networks:
-  coursesail_stack:
+  neko_auth_stack:
     name: neko_auth_stack
     driver: overlay
