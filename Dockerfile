@@ -54,7 +54,7 @@ RUN mix release
 RUN ls _build/prod
 RUN ls /app/_build/prod
 
-COPY /app_build/${MIX_ENV}/rel /app_build/${MIX_ENV}/rel
+COPY /app/_build/${MIX_ENV}/rel /app_build/${MIX_ENV}/rel
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
