@@ -47,7 +47,7 @@ RUN mix assets.deploy
 # Compile the release
 RUN mix compile
 
-RUN phx.gen.release
+RUN mix phx.gen.release
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
