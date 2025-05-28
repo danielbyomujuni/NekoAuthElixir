@@ -72,4 +72,4 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/neko_auth ./
 
 USER nobody
 
-CMD ["/app/bin/server"]
+CMD ["/app/bin/neko_auth"]
