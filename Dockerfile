@@ -47,10 +47,14 @@ RUN mix assets.deploy
 # Compile the release
 RUN mix compile
 
+RUN phx.gen.release
+
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
 
 COPY lib lib
+
+COPY rel rel
 
 RUN mix release
 
@@ -72,4 +76,6 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/neko_auth ./
 
 USER nobody
 
-CMD ["/app/bin/neko_auth"]
+RUN "/app/bin/migrate"
+
+CMD ["/app/bin/server"]
