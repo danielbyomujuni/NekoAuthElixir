@@ -7,6 +7,15 @@ import Config
 # before starting your production server.
 config :neko_auth, NekoAuthWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :neko_auth, NekoAuth.Repo,
+  username: System.get_env("POSTGRES_USER"),
+  hostname: System.get_env("POSTGRES_HOST"),
+  password: System.get_env("POSTGRES_PASSWORD"),
+  database: System.get_env("POSTGRES_DB"),
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: NekoAuth.Finch
 
