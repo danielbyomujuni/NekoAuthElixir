@@ -116,4 +116,5 @@ deploy-container:
       - docker context create neko_auth --docker "host=ssh://$SSH_USER@$SSH_HOST"
       - docker context use neko_auth
       - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+      - docker pull registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
       - docker stack deploy --with-registry-auth --detach=true --compose-file ./docker-compose.yml neko_auth
