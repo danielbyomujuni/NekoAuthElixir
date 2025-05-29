@@ -56,6 +56,8 @@ COPY lib lib
 
 COPY assets assets
 
+RUN cd assets && yarn install
+
 # compile assets
 RUN mix assets.deploy
 
