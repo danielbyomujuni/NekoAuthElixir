@@ -24,6 +24,11 @@ FROM ${BUILDER_IMAGE} as builder
 RUN apt-get update -y && apt-get install -y build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+RUN apt-get install -y nodejs \
+    && apt-get clean && rm -f /var/lib/apt/lists/*_*
+RUN npm install -g yarn
+
 # prepare build dir
 WORKDIR /app
 
