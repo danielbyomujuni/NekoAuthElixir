@@ -8,7 +8,6 @@ config :neko_auth, NekoAuth.Repo,
   hostname: System.get_env("POSTGRES_HOST"),
   password: System.get_env("POSTGRES_PASSWORD"),
   database: System.get_env("POSTGRES_DATABASE"),
-  port: 5007,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
