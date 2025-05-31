@@ -51,7 +51,7 @@ if (watch) {
 if (deploy) {
   opts = {
     ...opts,
-    minify: true
+    minify: false
   }
 }
 
