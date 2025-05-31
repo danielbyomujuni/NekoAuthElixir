@@ -3,7 +3,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router"
 import { Cat } from "lucide-react"
 
 
-export const Route = createFileRoute('/_portal')({
+export const Route = createFileRoute('/portal')({
     component: LayoutPortal,
   })
   
@@ -23,7 +23,8 @@ export function LayoutPortal() {
       </header>
       <main className="py-4 mb-auto">
         <Sidebar />
-        <Outlet />
+        <div className="ml-24 mr-8"><Outlet />
+        </div>
       </main>
       <footer className="w-full border-t py-6 md:py-0 ">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row mx-auto">

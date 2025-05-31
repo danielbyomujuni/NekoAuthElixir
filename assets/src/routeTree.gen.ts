@@ -11,17 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as PortalRouteImport } from './routes/_portal/route'
+import { Route as PortalRouteImport } from './routes/portal/route'
 import { Route as AuthenticationRouteImport } from './routes/_authentication/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as PortalPortalImport } from './routes/_portal/portal'
+import { Route as PortalIndexImport } from './routes/portal/index'
+import { Route as PortalServicesImport } from './routes/portal/services'
 import { Route as AuthenticationRegisterImport } from './routes/_authentication/register'
 import { Route as AuthenticationLoginImport } from './routes/_authentication/login'
 
 // Create/Update Routes
 
 const PortalRouteRoute = PortalRouteImport.update({
-  id: '/_portal',
+  id: '/portal',
+  path: '/portal',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -36,9 +38,15 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PortalPortalRoute = PortalPortalImport.update({
-  id: '/portal',
-  path: '/portal',
+const PortalIndexRoute = PortalIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+
+const PortalServicesRoute = PortalServicesImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => PortalRouteRoute,
 } as any)
 
@@ -72,10 +80,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticationRouteImport
       parentRoute: typeof rootRoute
     }
-    '/_portal': {
-      id: '/_portal'
-      path: ''
-      fullPath: ''
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRoute
     }
@@ -93,11 +101,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticationRegisterImport
       parentRoute: typeof AuthenticationRouteImport
     }
-    '/_portal/portal': {
-      id: '/_portal/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof PortalPortalImport
+    '/portal/services': {
+      id: '/portal/services'
+      path: '/services'
+      fullPath: '/portal/services'
+      preLoaderRoute: typeof PortalServicesImport
+      parentRoute: typeof PortalRouteImport
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexImport
       parentRoute: typeof PortalRouteImport
     }
   }
@@ -119,11 +134,13 @@ const AuthenticationRouteRouteWithChildren =
   AuthenticationRouteRoute._addFileChildren(AuthenticationRouteRouteChildren)
 
 interface PortalRouteRouteChildren {
-  PortalPortalRoute: typeof PortalPortalRoute
+  PortalServicesRoute: typeof PortalServicesRoute
+  PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteRouteChildren: PortalRouteRouteChildren = {
-  PortalPortalRoute: PortalPortalRoute,
+  PortalServicesRoute: PortalServicesRoute,
+  PortalIndexRoute: PortalIndexRoute,
 }
 
 const PortalRouteRouteWithChildren = PortalRouteRoute._addFileChildren(
@@ -132,43 +149,55 @@ const PortalRouteRouteWithChildren = PortalRouteRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof PortalRouteRouteWithChildren
+  '': typeof AuthenticationRouteRouteWithChildren
+  '/portal': typeof PortalRouteRouteWithChildren
   '/login': typeof AuthenticationLoginRoute
   '/register': typeof AuthenticationRegisterRoute
-  '/portal': typeof PortalPortalRoute
+  '/portal/services': typeof PortalServicesRoute
+  '/portal/': typeof PortalIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof PortalRouteRouteWithChildren
+  '': typeof AuthenticationRouteRouteWithChildren
   '/login': typeof AuthenticationLoginRoute
   '/register': typeof AuthenticationRegisterRoute
-  '/portal': typeof PortalPortalRoute
+  '/portal/services': typeof PortalServicesRoute
+  '/portal': typeof PortalIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_authentication': typeof AuthenticationRouteRouteWithChildren
-  '/_portal': typeof PortalRouteRouteWithChildren
+  '/portal': typeof PortalRouteRouteWithChildren
   '/_authentication/login': typeof AuthenticationLoginRoute
   '/_authentication/register': typeof AuthenticationRegisterRoute
-  '/_portal/portal': typeof PortalPortalRoute
+  '/portal/services': typeof PortalServicesRoute
+  '/portal/': typeof PortalIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/login' | '/register' | '/portal'
+  fullPaths:
+    | '/'
+    | ''
+    | '/portal'
+    | '/login'
+    | '/register'
+    | '/portal/services'
+    | '/portal/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/login' | '/register' | '/portal'
+  to: '/' | '' | '/login' | '/register' | '/portal/services' | '/portal'
   id:
     | '__root__'
     | '/'
     | '/_authentication'
-    | '/_portal'
+    | '/portal'
     | '/_authentication/login'
     | '/_authentication/register'
-    | '/_portal/portal'
+    | '/portal/services'
+    | '/portal/'
   fileRoutesById: FileRoutesById
 }
 
@@ -196,7 +225,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/_authentication",
-        "/_portal"
+        "/portal"
       ]
     },
     "/": {
@@ -209,10 +238,11 @@ export const routeTree = rootRoute
         "/_authentication/register"
       ]
     },
-    "/_portal": {
-      "filePath": "_portal/route.tsx",
+    "/portal": {
+      "filePath": "portal/route.tsx",
       "children": [
-        "/_portal/portal"
+        "/portal/services",
+        "/portal/"
       ]
     },
     "/_authentication/login": {
@@ -223,9 +253,13 @@ export const routeTree = rootRoute
       "filePath": "_authentication/register.tsx",
       "parent": "/_authentication"
     },
-    "/_portal/portal": {
-      "filePath": "_portal/portal.tsx",
-      "parent": "/_portal"
+    "/portal/services": {
+      "filePath": "portal/services.tsx",
+      "parent": "/portal"
+    },
+    "/portal/": {
+      "filePath": "portal/index.tsx",
+      "parent": "/portal"
     }
   }
 }

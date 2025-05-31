@@ -19,10 +19,9 @@ const mockUser = {
 import { gql, useMutation } from "@apollo/client"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute('/_portal/portal')({
+export const Route = createFileRoute('/portal/')({
     component: HomePortal,
   })
-  
 
 export default function HomePortal() {
   const [user, setUser] = useState(mockUser)
