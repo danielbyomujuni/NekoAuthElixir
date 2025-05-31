@@ -97,6 +97,8 @@ react-tests:
   stage: test
   needs:
       - build
+  rules:
+      - when: on_success
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
