@@ -93,6 +93,8 @@ ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/neko_auth ./
+COPY --chmod=0755 --chown=nobody:root priv/scripts/run_prod /app/bin/run
+CMD ["/app/bin/run"]
 
 USER nobody
 
@@ -101,4 +103,4 @@ USER nobody
 # above and adding an entrypoint. See https://github.com/krallin/tini for details
 # ENTRYPOINT ["/tini", "--"]
 
-ENTRYPOINT ["/app/bin/migrate",";","/app/bin/server"]
+ENTRYPOINT ["/app/bin/run"]

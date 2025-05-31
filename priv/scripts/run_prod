@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# allocate swap space
+if [ $UID -eq 0 ]; then
+  fallocate -l 1024M /swapfile
+  chmod 0600 /swapfile
+  mkswap /swapfile
+  echo 10 > /proc/sys/vm/swappiness
+  swapon /swapfile
+  echo 1 > /proc/sys/vm/overcommit_memory
+fi
+
+# Set open files
+ulimit -n 65536
+
+# Run any migrations on startup
+/app/bin/migrate
+
+exec /app/bin/server
