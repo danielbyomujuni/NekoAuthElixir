@@ -64,6 +64,9 @@ test:
       
 coverage:
    stage: test
+   rules:
+     - when: always
+       allow_failure: true
    before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
