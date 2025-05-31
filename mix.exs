@@ -88,7 +88,7 @@ defmodule NekoAuth.MixProject do
       "assets.install": ["cmd cd assets && yarn install"],
       "assets.tsc": ["cmd cd assets && yarn run tsc"],
       run: ["phx.server"],
-      "assets.deploy": ["cmd --cd assets yarn build", "phx.digest"],
+      "assets.deploy": ["cmd --cd assets yarn run build", "phx.digest"],
     ]
   end
 end

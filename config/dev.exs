@@ -8,7 +8,6 @@ config :neko_auth, NekoAuth.Repo,
   hostname: System.get_env("POSTGRES_HOST"),
   password: System.get_env("POSTGRES_PASSWORD"),
   database: System.get_env("POSTGRES_DATABASE"),
-  port: 5007,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -28,7 +27,7 @@ config :neko_auth, NekoAuthWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "ibVO9tR04FBJBeeMlgiTjVrJsKbBf3jenAvUekrl9FOx41zfKyHVMPkXrDkWo1Ic",
   watchers: [
-    yarn: ["watch", cd: Path.expand("../assets", __DIR__)]
+    yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support
