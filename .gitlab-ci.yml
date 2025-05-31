@@ -65,8 +65,7 @@ elixir-tests:
 elixir-coverage:
    stage: test
    rules:
-     - when: always
-       allow_failure: true
+     - allow_failure: true
    before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
@@ -102,8 +101,7 @@ react-tests:
 react-coverage:
    stage: test
    rules:
-     - when: always
-       allow_failure: true
+     - allow_failure: true
    before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
