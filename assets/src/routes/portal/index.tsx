@@ -16,7 +16,7 @@ const mockUser = {
   pfp: "/placeholder.svg?height=100&width=100"
 }
 
-import { gql, useMutation } from "@apollo/client"
+import { gql } from "@apollo/client"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute('/portal/')({
@@ -58,7 +58,7 @@ export default function HomePortal() {
           })
         }
       })
-      .catch((error) => {})
+      .catch(() => {})
   }, [])
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,26 +114,6 @@ export default function HomePortal() {
     }
   }
 
-  function ArrayBufferToString(buffer: any) {
-    return BinaryToString(String.fromCharCode.apply(null, Array.prototype.slice.apply(new Uint8Array(buffer))));
-    }
-
-function BinaryToString(binary: string) {
-  var error;
-
-  try {
-      return decodeURIComponent(escape(binary));
-  } catch (_error) {
-      error = _error;
-      if (error instanceof URIError) {
-          return binary;
-      } else {
-          throw error;
-      }
-  }
-}
-
-  
 
   const handleSaveChanges = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

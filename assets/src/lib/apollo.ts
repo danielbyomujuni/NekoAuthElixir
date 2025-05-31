@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql } from "@apollo/client"
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/client"
 import Cookies from 'js-cookie';
 
 function getAuthTokenFromCookie() {

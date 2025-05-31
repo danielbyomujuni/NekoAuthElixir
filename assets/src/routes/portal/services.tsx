@@ -23,7 +23,6 @@ import {
   Copy,
   Eye,
   EyeOff,
-  MoreHorizontal,
   Plus,
   Settings,
   Trash2,

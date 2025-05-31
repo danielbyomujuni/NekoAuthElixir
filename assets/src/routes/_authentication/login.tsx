@@ -66,7 +66,7 @@ export default function Login() {
             </div>
             <Input id="password" type="password" className="2xl:text-3xl 2xl:h-14" placeholder="password" onChange={(e) => {setPassword(e.target.value)}} required />
           </div>
-          <Button className="w-full" onClick={(e) => {handleSubmit()}}>
+          <Button className="w-full" onClick={() => {handleSubmit()}}>
             Login
           </Button>
         </div>
