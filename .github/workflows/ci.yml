@@ -116,8 +116,11 @@ jobs:
       - name: Run Ecto setup
         run: mix setup.pipeline
 
-      - name: Run Tests
+      - name: Run Elixir Tests
         run: mix test
+
+      - name: Run React Tests
+        run: mix assets.test
 
   coverage:
     needs: setup
@@ -156,8 +159,13 @@ jobs:
           key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-build
 
-      - name: Run Coverage
+      #- name: Run Elixir Coverage
+      #  run: |
+      #    touch testing.env.exs
+      #    mix setup.pipeline
+      #    mix coverage
+
+      - name: Run React Coverage
         run: |
-          touch testing.env.exs
           mix setup.pipeline
-          mix coverage
+          mix assets.coverage
