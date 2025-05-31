@@ -112,7 +112,7 @@ deploy-container:
     - build-container
   image: registry.gitlab.nekosyndicate.com/danielb/dockerfiles/debian-docker:44464b5d
   before_script:
-    GET SSH KEYS
+    # GET SSH KEYS
     - mkdir -p /root/.ssh/
     - chmod 700 ~/.ssh
     - eval $(ssh-agent -s)

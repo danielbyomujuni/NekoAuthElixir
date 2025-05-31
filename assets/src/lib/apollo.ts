@@ -19,7 +19,7 @@ export default function create_client() {
   })
 
   const httpLink = new HttpLink({
-    uri: "http://localhost:4050/api/graphql",
+    uri: "https://auth.nekosyndicate.com/api/graphql",
     credentials: "include" // keep this if backend needs cookies for other reasons
   })
 
@@ -35,7 +35,7 @@ export async function runWithTokens<T>(fun: () => Promise<T>): Promise<T> {
       return await fun();
     } catch (error) {
       console.error("Error occurred:", error);
-      const res = await fetch("http://localhost:4050/api/v1/oauth/token?" + new URLSearchParams({
+      const res = await fetch("https://auth.nekosyndicate.com/api/v1/oauth/token?" + new URLSearchParams({
         grant_type: "refresh_token",
         refresh_token: Cookies.get('portal_refresh_token') || ""
     }), { method: "POST", credentials: "include" });
