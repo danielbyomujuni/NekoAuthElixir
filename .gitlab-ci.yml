@@ -126,9 +126,9 @@ build-container:
       when: on_success
     - when: never
   needs:
-    - elixir-test
+    - elixir-tests
     - elixir-coverage
-    - react-test
+    - react-tests
     - react-coverage
   image: 
     name: gcr.io/kaniko-project/executor:v1.14.0-debug
