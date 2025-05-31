@@ -23,6 +23,8 @@ variables:
 
 deps:
   stage: deps
+  rules:
+      - when: always
   script:
     - mix deps.get
   before_script:
@@ -39,6 +41,8 @@ build:
   stage: build
   needs:
     - deps
+  rules:
+      - when: on_success
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
@@ -51,6 +55,8 @@ elixir-tests:
   stage: test
   needs:
       - build
+  rules:
+      - when: on_success
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
