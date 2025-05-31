@@ -27,7 +27,7 @@ config :neko_auth, NekoAuthWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "ibVO9tR04FBJBeeMlgiTjVrJsKbBf3jenAvUekrl9FOx41zfKyHVMPkXrDkWo1Ic",
   watchers: [
-    npm: ["run", "watch", cd: Path.expand("../assets", __DIR__)]
+    yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support

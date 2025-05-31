@@ -11,14 +11,47 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PortalRouteImport } from './routes/_portal/route'
+import { Route as AuthenticationRouteImport } from './routes/_authentication/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as PortalPortalImport } from './routes/_portal/portal'
+import { Route as AuthenticationRegisterImport } from './routes/_authentication/register'
+import { Route as AuthenticationLoginImport } from './routes/_authentication/login'
 
 // Create/Update Routes
+
+const PortalRouteRoute = PortalRouteImport.update({
+  id: '/_portal',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticationRouteRoute = AuthenticationRouteImport.update({
+  id: '/_authentication',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const PortalPortalRoute = PortalPortalImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => PortalRouteRoute,
+} as any)
+
+const AuthenticationRegisterRoute = AuthenticationRegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthenticationRouteRoute,
+} as any)
+
+const AuthenticationLoginRoute = AuthenticationLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthenticationRouteRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +65,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_authentication': {
+      id: '/_authentication'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticationRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_portal': {
+      id: '/_portal'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authentication/login': {
+      id: '/_authentication/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthenticationLoginImport
+      parentRoute: typeof AuthenticationRouteImport
+    }
+    '/_authentication/register': {
+      id: '/_authentication/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthenticationRegisterImport
+      parentRoute: typeof AuthenticationRouteImport
+    }
+    '/_portal/portal': {
+      id: '/_portal/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalPortalImport
+      parentRoute: typeof PortalRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AuthenticationRouteRouteChildren {
+  AuthenticationLoginRoute: typeof AuthenticationLoginRoute
+  AuthenticationRegisterRoute: typeof AuthenticationRegisterRoute
+}
+
+const AuthenticationRouteRouteChildren: AuthenticationRouteRouteChildren = {
+  AuthenticationLoginRoute: AuthenticationLoginRoute,
+  AuthenticationRegisterRoute: AuthenticationRegisterRoute,
+}
+
+const AuthenticationRouteRouteWithChildren =
+  AuthenticationRouteRoute._addFileChildren(AuthenticationRouteRouteChildren)
+
+interface PortalRouteRouteChildren {
+  PortalPortalRoute: typeof PortalPortalRoute
+}
+
+const PortalRouteRouteChildren: PortalRouteRouteChildren = {
+  PortalPortalRoute: PortalPortalRoute,
+}
+
+const PortalRouteRouteWithChildren = PortalRouteRoute._addFileChildren(
+  PortalRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof PortalRouteRouteWithChildren
+  '/login': typeof AuthenticationLoginRoute
+  '/register': typeof AuthenticationRegisterRoute
+  '/portal': typeof PortalPortalRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof PortalRouteRouteWithChildren
+  '/login': typeof AuthenticationLoginRoute
+  '/register': typeof AuthenticationRegisterRoute
+  '/portal': typeof PortalPortalRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_authentication': typeof AuthenticationRouteRouteWithChildren
+  '/_portal': typeof PortalRouteRouteWithChildren
+  '/_authentication/login': typeof AuthenticationLoginRoute
+  '/_authentication/register': typeof AuthenticationRegisterRoute
+  '/_portal/portal': typeof PortalPortalRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '' | '/login' | '/register' | '/portal'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '' | '/login' | '/register' | '/portal'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authentication'
+    | '/_portal'
+    | '/_authentication/login'
+    | '/_authentication/register'
+    | '/_portal/portal'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticationRouteRoute: typeof AuthenticationRouteRouteWithChildren
+  PortalRouteRoute: typeof PortalRouteRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticationRouteRoute: AuthenticationRouteRouteWithChildren,
+  PortalRouteRoute: PortalRouteRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +194,38 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/_authentication",
+        "/_portal"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_authentication": {
+      "filePath": "_authentication/route.tsx",
+      "children": [
+        "/_authentication/login",
+        "/_authentication/register"
+      ]
+    },
+    "/_portal": {
+      "filePath": "_portal/route.tsx",
+      "children": [
+        "/_portal/portal"
+      ]
+    },
+    "/_authentication/login": {
+      "filePath": "_authentication/login.tsx",
+      "parent": "/_authentication"
+    },
+    "/_authentication/register": {
+      "filePath": "_authentication/register.tsx",
+      "parent": "/_authentication"
+    },
+    "/_portal/portal": {
+      "filePath": "_portal/portal.tsx",
+      "parent": "/_portal"
     }
   }
 }

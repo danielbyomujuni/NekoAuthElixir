@@ -2,9 +2,12 @@ import { defineConfig } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { resolve } from "node:path";
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [TanStackRouterVite({ autoCodeSplitting: false }), viteReact()], // Disable code splitting
+  plugins: [TanStackRouterVite({ autoCodeSplitting: false }), viteReact(),
+    tailwindcss()
+  ], // Disable code splitting
   test: {
     globals: true,
     environment: "jsdom",
