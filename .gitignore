@@ -35,6 +35,8 @@ demo-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/assets/coverage/
+
 *.env.exs
 !pipeline.env.exs
 
