@@ -13,7 +13,7 @@ services:
       - '5007:5432'
     networks:
       - neko_auth_stack
-      
+
   main:
     image: registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
     env_file: ./prod.env
@@ -23,7 +23,7 @@ services:
       - POSTGRES_HOST=postgres
       - AUTH_TRUST_HOST=true
     ports:
-      - '5006:3000'
+      - '5006:4000'
     networks:
       - neko_auth_stack
 networks:
