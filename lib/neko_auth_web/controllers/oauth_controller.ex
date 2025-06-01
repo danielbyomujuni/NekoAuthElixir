@@ -20,7 +20,6 @@ defmodule NekoAuthWeb.OAuthController do
         login_url =
           domain
           |> AuthorizeDomain.create_url("#{System.get_env("HOST_NAME")}/login")
-          |> dbg()
 
         conn
         |> put_resp_header("location", login_url)

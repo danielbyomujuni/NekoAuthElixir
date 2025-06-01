@@ -23,7 +23,7 @@ services:
       - POSTGRES_HOST=postgres
       - AUTH_TRUST_HOST=true
       - SALT_ROUNDS=10
-      - HOST_NAME="https://auth.nekosyndicate.com"
+      - HOST_NAME=https://auth.nekosyndicate.com
     ports:
       - '5006:4000'
     networks:
