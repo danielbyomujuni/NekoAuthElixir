@@ -5,7 +5,7 @@ To start your Phoenix server:
 - Run `mix setup` to install and setup dependencies
 - Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
-Now you can visit [`localhost:4050`](https://auth.nekosyndicate.com) from your browser.
+Now you can visit [`localhost:4050`](http://localhost:4050) from your browser.
 
 ## Dependencies
 
