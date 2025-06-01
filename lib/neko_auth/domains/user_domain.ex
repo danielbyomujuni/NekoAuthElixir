@@ -78,9 +78,6 @@ defp validate_password_confirmation(password, password_confirmation) do
 end
 
 defp validate_date_of_birth(date_of_birth) do
-  IO.inspect(date_of_birth, label: "Date of Birth")
-  IO.inspect(latest_birth_date(), label: "Latest")
-
   case DomainValidator.new(date_of_birth)
        |> DomainValidator.validate(max_value: latest_birth_date(), nullable: false) do
     true -> {:ok, :date_of_birth}

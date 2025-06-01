@@ -15,17 +15,17 @@ defmodule NekoAuth.Domains.UserDomainTest do
 
   describe "is_registration_valid?/1" do
     test "returns true for valid data" do
-      assert UserDomain.is_registration_valid?(struct(RegistrationStruct, @valid_attrs))
+      assert {:ok, _} = UserDomain.is_registration_valid?(struct(RegistrationStruct, @valid_attrs))
     end
 
     test "returns false if password doesn't match confirmation" do
       attrs = Map.put(@valid_attrs, :password_confirmation, "wrong")
-      refute UserDomain.is_registration_valid?(struct(RegistrationStruct, attrs))
+      assert {:error, :password_confirmation} = UserDomain.is_registration_valid?(struct(RegistrationStruct, attrs))
     end
 
     test "returns false if email is invalid" do
       attrs = Map.put(@valid_attrs, :email, "bad-email")
-      refute UserDomain.is_registration_valid?(struct(RegistrationStruct, attrs))
+      assert {:error, :email} = UserDomain.is_registration_valid?(struct(RegistrationStruct, attrs))
     end
   end
 
