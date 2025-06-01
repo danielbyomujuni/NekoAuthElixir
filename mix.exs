@@ -87,6 +87,8 @@ defmodule NekoAuth.MixProject do
       coverage: ["test --cover"],
       "assets.install": ["cmd cd assets && yarn install"],
       "assets.tsc": ["cmd cd assets && yarn run tsc"],
+      "assets.test": ["cmd cd assets && yarn run test"],
+      "assets.coverage": ["cmd cd assets && yarn run test"],
       run: ["phx.server"],
       "assets.deploy": ["cmd --cd assets yarn run build", "phx.digest"],
     ]
