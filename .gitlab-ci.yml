@@ -1,10 +1,10 @@
 image: elixir:1.18.3-alpine
 
 stages:
-   - deps
-   - build
-   - test
-   - deploy
+  - deps
+  - build
+  - test
+  - deploy
 
 services:
   - postgres:latest
@@ -21,10 +21,35 @@ variables:
   SALT_ROUNDS: 10
   POSTGRES_URL: "postgres://postgres:ci_pipeline_password@postgres/neko_auth_test"
 
+.cache_template: &cache_template
+  cache:
+    key:
+      files:
+        - mix.lock
+        - assets/package-lock.json
+    paths:
+      - _build/
+      - deps/
+      - assets/node_modules/
+    policy: pull
+
+.cache_push_template: &cache_push_template
+  cache:
+    key:
+      files:
+        - mix.lock
+        - assets/package-lock.json
+    paths:
+      - _build/
+      - deps/
+      - assets/node_modules/
+    policy: pull-push
+
 deps:
   stage: deps
   rules:
-      - when: always
+    - when: always
+  <<: *cache_push_template
   script:
     - mix deps.get
   before_script:
@@ -42,7 +67,8 @@ build:
   needs:
     - deps
   rules:
-      - when: on_success
+    - when: on_success
+  <<: *cache_template
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
@@ -54,9 +80,10 @@ build:
 elixir-tests:
   stage: test
   needs:
-      - build
+    - build
   rules:
-      - when: on_success
+    - when: on_success
+  <<: *cache_template
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
@@ -69,36 +96,37 @@ elixir-tests:
     when: always
     reports:
       junit: report.xml
-      
+
 elixir-coverage:
-   stage: test
-   needs:
-      - build
-   rules:
-      - when: on_success
-        allow_failure: true
-   before_script:
+  stage: test
+  needs:
+    - build
+  rules:
+    - when: on_success
+      allow_failure: true
+  <<: *cache_template
+  before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
     - touch testing.env.exs
     - mix setup.pipeline
-   script:
-     - mix ecto.create --quiet
-     - mix ecto.migrate --quiet
-     - mix coverage
-   coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
-   artifacts:
-     paths:
-       - cover
-     when: always
-
+  script:
+    - mix ecto.create --quiet
+    - mix ecto.migrate --quiet
+    - mix coverage
+  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
+  artifacts:
+    paths:
+      - cover
+    when: always
 
 react-tests:
   stage: test
   needs:
-      - build
+    - build
   rules:
-      - when: on_success
+    - when: on_success
+  <<: *cache_template
   before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
@@ -112,28 +140,29 @@ react-tests:
     when: always
     reports:
       junit: report.xml
-      
+
 react-coverage:
-   stage: test
-   needs:
-      - build
-   rules:
-     - when: on_success
-       allow_failure: true
-   before_script:
+  stage: test
+  needs:
+    - build
+  rules:
+    - when: on_success
+      allow_failure: true
+  <<: *cache_template
+  before_script:
     - apk add --no-cache build-base git openssl-dev
     - apk add --no-cache nodejs npm yarn
     - touch testing.env.exs
     - mix setup.pipeline
-   script:
-      - mix setup
-      - mix assets.install
-      - mix assets.coverage
-   coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
-   artifacts:
-     paths:
-       - cover
-     when: always
+  script:
+    - mix setup
+    - mix assets.install
+    - mix assets.coverage
+  coverage: '/(\d+\.\d+)%\s+\|\s+Total/'
+  artifacts:
+    paths:
+      - cover
+    when: always
 
 build-container:
   stage: deploy
@@ -146,7 +175,7 @@ build-container:
     - elixir-coverage
     - react-tests
     - react-coverage
-  image: 
+  image:
     name: gcr.io/kaniko-project/executor:v1.14.0-debug
     entrypoint: [""]
   tags:
@@ -178,9 +207,9 @@ deploy-container:
     - cd $CI_PROJECT_DIR
     - unset DOCKER_HOST
   script:
-      - cp $PROD_ENV prod.env
-      - docker context create neko_auth --docker "host=ssh://$SSH_USER@$SSH_HOST"
-      - docker context use neko_auth
-      - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
-      - docker pull registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
-      - docker stack deploy --with-registry-auth --detach=true --compose-file ./docker-compose.yml neko_auth
+    - cp $PROD_ENV prod.env
+    - docker context create neko_auth --docker "host=ssh://$SSH_USER@$SSH_HOST"
+    - docker context use neko_auth
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - docker pull registry.gitlab.nekosyndicate.com/neko-syndicate/neko-auth-elixir:latest
+    - docker stack deploy --with-registry-auth --detach=true --compose-file ./docker-compose.yml neko_auth
