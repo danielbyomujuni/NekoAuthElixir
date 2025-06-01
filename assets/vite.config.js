@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  base: "https://auth.nekosyndicate.com",
   plugins: [TanStackRouterVite({ autoCodeSplitting: false }), viteReact(),
     tailwindcss()
   ], // Disable code splitting

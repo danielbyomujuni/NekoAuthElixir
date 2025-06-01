@@ -1,7 +1,7 @@
 function login() {
     const params:URLSearchParams = new URLSearchParams();
     params.set("client_id", "1");
-    params.set("redirect_uri", "https://auth.nekosyndicate.com/api/v1/portal/callback");
+    params.set("redirect_uri", `${import.meta.env.BASE_URL}api/v1/portal/callback`);
     params.set("scope", "openid profile email");
     params.set("response_type", "code");
     params.set("response_mode", "form_post");
