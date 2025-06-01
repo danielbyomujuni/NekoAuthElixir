@@ -39,7 +39,7 @@ defmodule NekoAuthWeb.UserController do
       }
 
       # IO.inspect(email)
-      # IO.inspect(registration)
+      IO.inspect(registration)
 
       case UserManager.register_new_user(registration) do
         {:ok, _user} ->

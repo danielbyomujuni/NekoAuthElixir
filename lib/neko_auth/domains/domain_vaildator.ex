@@ -84,6 +84,15 @@ defmodule DomainValidator do
   end
 
   @doc false
+  defp compare(%Date{} = d1, %Date{} = d2, :>=), do: Date.compare(d1, d2) in [:gt, :eq]
+  defp compare(%Date{} = d1, %Date{} = d2, :<=), do: Date.compare(d1, d2) in [:lt, :eq]
+
+  defp compare(%DateTime{} = dt1, %DateTime{} = dt2, :>=), do: DateTime.compare(dt1, dt2) in [:gt, :eq]
+  defp compare(%DateTime{} = dt1, %DateTime{} = dt2, :<=), do: DateTime.compare(dt1, dt2) in [:lt, :eq]
+
+  defp compare(%NaiveDateTime{} = ndt1, %NaiveDateTime{} = ndt2, :>=), do: NaiveDateTime.compare(ndt1, ndt2) in [:gt, :eq]
+  defp compare(%NaiveDateTime{} = ndt1, %NaiveDateTime{} = ndt2, :<=), do: NaiveDateTime.compare(ndt1, ndt2) in [:lt, :eq]
+
   defp compare(val1, val2, :>=), do: val1 >= val2
   defp compare(val1, val2, :<=), do: val1 <= val2
 

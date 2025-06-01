@@ -15,26 +15,78 @@ defmodule NekoAuth.Domains.UserDomain do
   @doc """
   Validates a RegistrationStruct using domain-specific rules.
   """
-  def is_registration_valid?(%RegistrationStruct{} = data) do
-    DomainValidator.new(String.trim(data.email || ""))
-    |> DomainValidator.validate(min_length: 5, max_length: 65, nullable: false,
-         regex: ~s/^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/)
-    and
-    DomainValidator.new(String.trim(data.display_name || ""))
-    |> DomainValidator.validate(min_length: 5, max_length: 50, nullable: false)
-    and
-    DomainValidator.new(String.trim(data.user_name || ""))
-    |> DomainValidator.validate(min_length: 5, max_length: 50, nullable: false)
-    and
-    DomainValidator.new(String.trim(data.password || ""))
-    |> DomainValidator.validate(min_length: 8, max_length: 50, nullable: false,
-         regex: ~s/^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[#?!@$%^&*-]).+$/)
-    and
-    data.password == String.trim(data.password_confirmation || "")
-    and
-    DomainValidator.new(data.date_of_birth)
-    |> DomainValidator.validate(max_value: latest_birth_date(), nullable: false)
+def is_registration_valid?(%RegistrationStruct{} = data) do
+  with {:ok, _} <- validate_email(data.email),
+       {:ok, _} <- validate_display_name(data.display_name),
+       {:ok, _} <- validate_user_name(data.user_name),
+       {:ok, _} <- validate_password(data.password),
+       {:ok, _} <- validate_password_confirmation(data.password, data.password_confirmation),
+       {:ok, _} <- validate_date_of_birth(data.date_of_birth) do
+    {:ok, data}
+  else
+    error -> error
   end
+end
+
+defp validate_email(email) do
+  case DomainValidator.new(String.trim(email || ""))
+       |> DomainValidator.validate(
+         min_length: 5,
+         max_length: 65,
+         nullable: false,
+         regex: ~s/^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/
+       ) do
+    true -> {:ok, :email}
+    false -> {:error, :email}
+  end
+end
+
+defp validate_display_name(display_name) do
+  case DomainValidator.new(String.trim(display_name || ""))
+       |> DomainValidator.validate(min_length: 5, max_length: 50, nullable: false) do
+    true -> {:ok, :display_name}
+    false -> {:error, :display_name}
+  end
+end
+
+defp validate_user_name(user_name) do
+  case DomainValidator.new(String.trim(user_name || ""))
+       |> DomainValidator.validate(min_length: 5, max_length: 50, nullable: false) do
+    true -> {:ok, :user_name}
+    false -> {:error, :user_name}
+  end
+end
+
+defp validate_password(password) do
+  case DomainValidator.new(String.trim(password || ""))
+       |> DomainValidator.validate(
+         min_length: 8,
+         max_length: 50,
+         nullable: false,
+         regex: ~s/^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[#?!@$%^&*-]).+$/
+       ) do
+    true -> {:ok, :password}
+    false -> {:error, :password}
+  end
+end
+
+defp validate_password_confirmation(password, password_confirmation) do
+  case password == String.trim(password_confirmation || "") do
+    true -> {:ok, :password_confirmation}
+    false -> {:error, :password_confirmation}
+  end
+end
+
+defp validate_date_of_birth(date_of_birth) do
+  IO.inspect(date_of_birth, label: "Date of Birth")
+  IO.inspect(latest_birth_date(), label: "Latest")
+
+  case DomainValidator.new(date_of_birth)
+       |> DomainValidator.validate(max_value: latest_birth_date(), nullable: false) do
+    true -> {:ok, :date_of_birth}
+    false -> {:error, :date_of_birth}
+  end
+end
 
   defp latest_birth_date do
     today = Date.utc_today()

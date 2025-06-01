@@ -48,7 +48,7 @@ export default function Register() {
           toast((await res.json()).value);
         } else {
           //@ts-ignore
-          navigate("/login?" + new URLSearchParams(searchParams));
+          navigate({to: "/login?" + new URLSearchParams(searchParams)});
         }
       };
     

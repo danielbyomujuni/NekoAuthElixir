@@ -38,7 +38,7 @@ defmodule NekoAuth.User.UserManager do
   Returns `{:ok, %User{}}` or `{:error, reason}`.
   """
   def register_new_user(%RegistrationStruct{} = new_user_data) do
-    with true <- UserDomain.is_registration_valid?(new_user_data),
+    with {:ok, _} <- UserDomain.is_registration_valid?(new_user_data),
          false <- UserDomain.user_exists?(new_user_data.email),
          {:ok, discriminator} <- UserDomain.request_next_discriminator(new_user_data.user_name),
          # IO.puts("Discriminator: #{discriminator}"),
@@ -59,7 +59,7 @@ defmodule NekoAuth.User.UserManager do
     else
       false -> Result.err("Invalid User Domain")
       true -> Result.err("User Already Exists")
-      {:error, reason} -> Result.err("Database Error #{reason}")
+      {:error, reason} -> Result.err("Registration Error #{reason}")
       _ -> Result.err("Unexpected Error")
     end
   end
