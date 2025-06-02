@@ -63,6 +63,7 @@ defmodule NekoAuthWeb.Router do
     pipe_through :api
     get "/oauth/authorize", OAuthController, :authorize
     post "/oauth/token", OAuthController, :token
+    get "/oauth/user", UserController, :user
 
     get "/portal/callback", PortalController, :callback
 

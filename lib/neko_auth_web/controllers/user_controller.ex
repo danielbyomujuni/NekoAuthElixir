@@ -153,7 +153,58 @@ defmodule NekoAuthWeb.UserController do
     data_url
   end
 
+  def user(conn, %{} = query_params) do
+    with {:ok, token} <- extract_bearer_token(conn),
+         {:ok, user} <- UserManager.user_from_access_token(token) do
 
+      user_info = %{
+        sub: "#{user.user_name}##{user.descriminator}",
+        email: user.email,
+        email_verified: user.email_verified || false,
+        user_name: user.user_name,
+        descriminator: user.descriminator,
+        avatar: "#{System.get_env("HOST_NAME")}/api/v1/avatars/#{user.user_name}/#{user.descriminator}",
+        display_name: user.display_name,
+      }
+
+      conn
+      |> put_resp_content_type("application/json")
+      |> put_status(200)
+      |> json(user_info)
+    else
+      {:error, :invalid_token} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> put_status(401)
+        |> json(%{error: "invalid_token", error_description: "The access token is invalid"})
+
+      {:error, :expired_token} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> put_status(401)
+        |> json(%{error: "invalid_token", error_description: "The access token has expired"})
+
+      {:error, :user_not_found} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> put_status(404)
+        |> json(%{error: "user_not_found", error_description: "User not found"})
+
+      _ ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> put_status(500)
+        |> json(%{error: "server_error", error_description: "Internal server error"})
+    end
+  end
+
+  # Helper function to extract Bearer token from Authorization header
+  defp extract_bearer_token(conn) do
+    case get_req_header(conn, "authorization") do
+      ["Bearer " <> token] -> {:ok, token}
+      _ -> {:error, :invalid_token}
+    end
+  end
 
   defp extract_login_payload(%{
          "auth" => auth,

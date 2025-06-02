@@ -116,4 +116,6 @@ defmodule NekoAuthWeb.OAuthController do
     |> put_status(400)
     |> json(%{error: "invalid_request", error_description: message})
   end
+
+
 end
