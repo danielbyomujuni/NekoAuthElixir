@@ -82,7 +82,7 @@ defmodule NekoAuth.User.UserManager do
   def create_access_token(%User{} = user) do
     claims = %{
       "sub" => user.email,
-      "aud" => 1,
+      "aud" => "1",
       "scope" => "openid profile",
       "exp" => current_time() + @access_token_ttl,
       "iss" => @issuer
@@ -108,7 +108,7 @@ defmodule NekoAuth.User.UserManager do
   def create_refresh_token(%User{} = user) do
     claims = %{
       "sub" => user.email,
-      "aud" => 1,
+      "aud" => "1",
       "exp" => current_time() + @refresh_token_ttl,
       "iss" => @issuer
     }
@@ -133,7 +133,7 @@ defmodule NekoAuth.User.UserManager do
     claims =
       %{
         "sub" => user.email,
-        "aud" => 1,
+        "aud" => "1",
         "name" => user.display_name,
         "preferred_username" => user.user_name,
         "discriminator" => user.descriminator,
