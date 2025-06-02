@@ -83,6 +83,7 @@ defmodule NekoAuth.User.UserManager do
     claims = %{
       "sub" => user.email,
       "aud" => "1",
+      "iat" => current_time(),
       "scope" => "openid profile",
       "exp" => current_time() + @access_token_ttl,
       "iss" => @issuer
@@ -109,6 +110,7 @@ defmodule NekoAuth.User.UserManager do
     claims = %{
       "sub" => user.email,
       "aud" => "1",
+      "iat" => current_time(),
       "exp" => current_time() + @refresh_token_ttl,
       "iss" => @issuer
     }
@@ -138,6 +140,7 @@ defmodule NekoAuth.User.UserManager do
         "preferred_username" => user.user_name,
         "discriminator" => user.descriminator,
         "iss" => @issuer,
+        "iat" => current_time(),
         "exp" => current_time() + @access_token_ttl
       }
       |> maybe_put("nonce", nonce)
