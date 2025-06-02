@@ -52,6 +52,13 @@ defmodule NekoAuthWeb.Router do
     get "/", PageController, :home
     get "/services", PageController, :home
   end
+
+  scope "/.well-known", NekoAuthWeb do
+    pipe_through :api
+    get "jwks.json", OpenidcController, :jwks
+    get "openid-configuration", OpenidcController, :config
+  end
+
   scope "/api/v1", NekoAuthWeb do
     pipe_through :api
     get "/oauth/authorize", OAuthController, :authorize

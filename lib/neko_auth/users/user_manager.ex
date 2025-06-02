@@ -17,7 +17,7 @@ defmodule NekoAuth.User.UserManager do
   @refresh_token_ttl 30 * 60 * 60 * 24
   # 1 minute
   @auth_code_ttl 1 * 60
-  @issuer "neko_auth"
+  @issuer "https://auth.nekosyndicate.com"
 
   @spec register_new_user(%RegistrationStruct{
           email: false | nil | binary(),
