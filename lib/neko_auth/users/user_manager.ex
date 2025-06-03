@@ -136,9 +136,12 @@ defmodule NekoAuth.User.UserManager do
       %{
         "sub" => user.email,
         "aud" => "1",
-        "name" => user.display_name,
-        "preferred_username" => user.user_name,
-        "discriminator" => user.descriminator,
+        "email" => user.email,
+        "email_verified" => user.email_verified || false,
+        "user_name" => user.user_name,
+        "descriminator" => user.descriminator,
+        "avatar" => "#{System.get_env("HOST_NAME")}/api/v1/avatars/#{user.user_name}/#{user.descriminator}",
+        "display_name" => user.display_name,
         "iss" => @issuer,
         "iat" => current_time(),
         "exp" => current_time() + @access_token_ttl
