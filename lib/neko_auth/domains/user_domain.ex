@@ -145,7 +145,11 @@ end
   """
   def get_user_by_email(email) do
     user =
-      Repo.get(User, email)
+      from(
+        u in User,
+        where: u.email == ^email
+      )
+      |> Repo.one!()
 
     case user do
       nil -> Result.err("User not found")
