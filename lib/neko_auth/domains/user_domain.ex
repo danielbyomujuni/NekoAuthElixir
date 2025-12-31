@@ -34,7 +34,7 @@ defp validate_email(email) do
          min_length: 5,
          max_length: 65,
          nullable: false,
-         regex: ~s/^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/
+         regex: "^[\\w\\-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
        ) do
     true -> {:ok, :email}
     false -> {:error, :email}
