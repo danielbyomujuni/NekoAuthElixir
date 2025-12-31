@@ -5,6 +5,7 @@ alias NekoAuth.Domains.UserDomain
   alias NekoAuth.Users.User
   alias NekoAuth.User.UserManager
   alias RegistrationStruct
+  alias NekoAuth.Users.Sessions
 
   setup do
     reg = %RegistrationStruct{
@@ -81,9 +82,159 @@ alias NekoAuth.Domains.UserDomain
   end
 
   describe "authorization code flow" do
-    test "encodes and decodes user", %{user: user} do
-      code = UserManager.generate_auth_code(user, %AuthorizeDomain{} )
-      assert {:ok, ^user} = UserManager.user_from_auth_code(code, nil)
+    test "generate_auth_code/2 inserts a session and returns the code", %{user: user} do
+      auth_domain = %AuthorizeDomain{
+        code_challenge: "challenge",
+        code_challenge_method: "plain"
+      }
+
+      code = UserManager.generate_auth_code(user, auth_domain)
+
+      assert is_binary(code)
+      assert byte_size(code) > 0
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.user_id == user.id
+      assert session.code == code
+      assert session.code_challenge == "challenge"
+      assert session.code_method == "plain"
+      assert session.code_used_at == nil
+    end
+
+    test "user_from_auth_code/2 returns {:ok, user} and marks code as used (no PKCE)", %{
+      user: user
+    } do
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: nil,
+          code_challenge_method: nil
+        })
+
+      user_id = user.id
+
+      assert {:ok, %User{id: ^user_id}} = UserManager.user_from_auth_code(code, nil)
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.code_used_at != nil
+    end
+
+    test "user_from_auth_code/2 returns {:ok, user} and marks code as used (PKCE plain)",
+         %{user: user} do
+      verifier = "my-verifier-123"
+
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: verifier,
+          code_challenge_method: "plain"
+        })
+
+       user_id = user.id
+
+      assert {:ok, %User{id: ^user_id}} = UserManager.user_from_auth_code(code, verifier)
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.code_used_at != nil
+    end
+
+    test "user_from_auth_code/2 returns {:error, :challenge_failed} for PKCE plain mismatch",
+         %{user: user} do
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: "expected",
+          code_challenge_method: "plain"
+        })
+
+      assert {:error, :challenge_failed} =
+               UserManager.user_from_auth_code(code, "actual")
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.code_used_at == nil
+    end
+
+    test "user_from_auth_code/2 returns {:ok, user} and marks code as used (PKCE S256)",
+         %{user: user} do
+      verifier = "verifier-value"
+
+      challenge =
+        :crypto.hash(:sha256, verifier)
+        |> Base.url_encode64(padding: false)
+
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: challenge,
+          code_challenge_method: "S256"
+        })
+
+               user_id = user.id
+
+
+      assert {:ok, %User{id: ^user_id}} = UserManager.user_from_auth_code(code, verifier)
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.code_used_at != nil
+    end
+
+    test "user_from_auth_code/2 returns {:error, :challenge_failed} for PKCE S256 mismatch",
+         %{user: user} do
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: "not-the-hash",
+          code_challenge_method: "S256"
+        })
+
+      assert {:error, :challenge_failed} =
+               UserManager.user_from_auth_code(code, "verifier")
+
+      session =
+        Repo.one!(
+          from s in Sessions,
+            where: s.code == ^code
+        )
+
+      assert session.code_used_at == nil
+    end
+
+    test "user_from_auth_code/2 returns {:error, :invalid_session} for unknown code" do
+      assert {:error, :invalid_session} =
+               UserManager.user_from_auth_code("does-not-exist", nil)
+    end
+
+    test "user_from_auth_code/2 returns {:error, :invalid_session} when code already used",
+         %{user: user} do
+      code =
+        UserManager.generate_auth_code(user, %AuthorizeDomain{
+          code_challenge: nil,
+          code_challenge_method: nil
+        })
+
+      assert {:ok, _user} = UserManager.user_from_auth_code(code, nil)
+
+      assert {:error, :invalid_session} = UserManager.user_from_auth_code(code, nil)
     end
   end
 end

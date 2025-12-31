@@ -33,7 +33,7 @@ defmodule NekoAuthWeb.OpenidcController do
     |> json(jwks)
   end
 
-  def config(conn, %{}) do
+  def config(conn, %{} = _query_params) do
     host_name = System.get_env("HOST_NAME")
 
     config = %{

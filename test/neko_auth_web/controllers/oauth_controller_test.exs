@@ -140,5 +140,158 @@ defmodule NekoAuthWeb.OAuthControllerTest do
 
       assert json_response(conn, 400)["error_description"] =~ "[T104] Invalid Token"
     end
+
+
+test "authorization_code: returns error for missing code_verifier", %{conn: conn, user: user} do
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: "whatever",
+      code_challenge_method: "plain"
+    })
+
+  conn =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code
+    })
+
+  assert json_response(conn, 400)["error"] == "invalid_request"
+end
+
+test "authorization_code (plain PKCE): returns tokens when code_verifier matches", %{
+  conn: conn,
+  user: user
+} do
+  code_verifier = "my-verifier"
+
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: code_verifier,
+      code_challenge_method: "plain"
+    })
+
+  conn =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => code_verifier
+    })
+
+  assert json = json_response(conn, 200)
+  assert json["access_token"]
+  assert json["id_token"]
+  assert json["refresh_token"]
+  assert json["token_type"] == "Bearer"
+  assert json["expires_in"]
+end
+
+test "authorization_code (plain PKCE): returns error when code_verifier mismatches", %{
+  conn: conn,
+  user: user
+} do
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: "expected",
+      code_challenge_method: "plain"
+    })
+
+  conn =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => "actual"
+    })
+
+  assert json = json_response(conn, 400)
+  assert json["error_description"] =~ "[T104]"
+  assert json["error_description"] =~ "challenge_failed"
+end
+
+test "authorization_code (S256 PKCE): returns tokens when code_verifier matches", %{
+  conn: conn,
+  user: user
+} do
+  code_verifier = "verifier-value"
+
+  code_challenge =
+    :crypto.hash(:sha256, code_verifier)
+    |> Base.url_encode64(padding: false)
+
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: code_challenge,
+      code_challenge_method: "S256"
+    })
+
+  conn =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => code_verifier
+    })
+
+  assert json = json_response(conn, 200)
+  assert json["access_token"]
+  assert json["id_token"]
+  assert json["refresh_token"]
+  assert json["token_type"] == "Bearer"
+  assert json["expires_in"]
+end
+
+test "authorization_code (S256 PKCE): returns error when code_verifier mismatches", %{
+  conn: conn,
+  user: user
+} do
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: "not-the-hash",
+      code_challenge_method: "S256"
+    })
+
+  conn =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => "verifier-value"
+    })
+
+  assert json = json_response(conn, 400)
+  assert json["error_description"] =~ "[T104]"
+  assert json["error_description"] =~ "challenge_failed"
+end
+
+test "authorization_code: cannot reuse same code (second attempt fails)", %{
+  conn: conn,
+  user: user
+} do
+  code_verifier = "my-verifier"
+
+  code =
+    UserManager.generate_auth_code(user, %AuthorizeDomain{
+      code_challenge: code_verifier,
+      code_challenge_method: "plain"
+    })
+
+  conn1 =
+    post(conn, "/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => code_verifier
+    })
+
+  assert json_response(conn1, 200)
+
+  conn2 =
+    build_conn()
+    |> post("/api/v1/oauth/token", %{
+      "grant_type" => "authorization_code",
+      "code" => code,
+      "code_verifier" => code_verifier
+    })
+
+  assert json = json_response(conn2, 400)
+  assert json["error_description"] =~ "[T104]"
+  assert json["error_description"] =~ "invalid_session"
+end
   end
 end
