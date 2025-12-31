@@ -70,7 +70,7 @@ defmodule NekoAuthWeb.UserController do
 
   @spec generate_redirect_uri(String.t(), String.t(), keyword()) :: String.t()
   def generate_redirect_uri(base_url, path, query_params \\ []) do
-    uri = URI.merge(base_url, path)
+    uri = URI.merge(base_url, path) |> dbg()
     query = URI.encode_query(query_params)
     uri_with_query = %URI{uri | query: query}
     URI.to_string(uri_with_query)
