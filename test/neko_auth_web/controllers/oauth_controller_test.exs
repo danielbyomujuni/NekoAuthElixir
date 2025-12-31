@@ -4,7 +4,6 @@ defmodule NekoAuthWeb.OAuthControllerTest do
   import Phoenix.ConnTest
   alias NekoAuth.Domains.UserDomain
   alias NekoAuth.User.UserManager
-  alias NekoAuth.Users.User
 
 
   @valid_params %{

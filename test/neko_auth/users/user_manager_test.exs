@@ -4,7 +4,6 @@ alias NekoAuth.Domains.UserDomain
 
   alias NekoAuth.Users.User
   alias NekoAuth.User.UserManager
-  alias NekoAuth.Repo
   alias RegistrationStruct
 
   setup do

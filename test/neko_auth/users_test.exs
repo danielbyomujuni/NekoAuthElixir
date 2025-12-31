@@ -68,7 +68,7 @@ alias NekoAuth.Domains.UserDomain
     test "deletes the user" do
       user = create_user_fixture()
       assert {:ok, _} = Users.delete_user(user)
-      assert_raise Ecto.NoResultsError, fn -> UserDomain.get_user_by_email(user.email) end
+      assert {:error, _ } = UserDomain.get_user_by_email(user.email)
     end
   end
 
