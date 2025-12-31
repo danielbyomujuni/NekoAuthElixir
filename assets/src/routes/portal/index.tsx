@@ -13,7 +13,7 @@ const mockUser = {
   descriminator: 0,
   email_verified: true,
   email: "john@example.com",
-  pfp: "/placeholder.svg?height=100&width=100"
+  pfp: ""
 }
 
 import { gql } from "@apollo/client"

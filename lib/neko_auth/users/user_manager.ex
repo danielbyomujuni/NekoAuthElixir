@@ -101,7 +101,7 @@ defmodule NekoAuth.User.UserManager do
     with {true, jwt, _} <- JOSE.JWT.verify(key, {%{alg: :jose_jws_alg_rsa_pkcs1_v1_5}, token}),
         {%{}, %{"sub" => email, "exp" => exp}} <- JOSE.JWT.to_map(jwt),
          true <- current_time() < exp,
-         user when not is_nil(user) <- Repo.get(User, email) do
+         {:ok, user} <- UserDomain.get_user_by_email(email) do
         {:ok, user}
     else
       _ -> {:error, :invalid_token}
@@ -127,7 +127,7 @@ defmodule NekoAuth.User.UserManager do
     with {true, jwt, _} <- JOSE.JWT.verify(key, {%{alg: :jose_jws_alg_rsa_pkcs1_v1_5}, token}),
         {%{}, %{"sub" => email, "exp" => exp}} <- JOSE.JWT.to_map(jwt),
          true <- current_time() < exp,
-         user when not is_nil(user) <- Repo.get(User, email) do
+         {:ok, user} <- UserDomain.get_user_by_email(email) do
         {:ok, user}
     else
       _ -> {:error, :invalid_token}

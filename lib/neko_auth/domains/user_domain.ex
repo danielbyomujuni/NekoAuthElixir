@@ -149,7 +149,7 @@ end
         u in User,
         where: u.email == ^email
       )
-      |> Repo.one!()
+      |> Repo.one()
 
     case user do
       nil -> Result.err("User not found")
