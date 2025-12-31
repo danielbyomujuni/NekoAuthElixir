@@ -70,7 +70,7 @@ defmodule NekoAuthWeb.OAuthController do
          refresh_token <- UserManager.create_refresh_token(user) do
 
       conn
-      |> put_resp_header("Access-Control-Allow-Origin", "*")
+      |> put_resp_header("access-control-allow-origin", "*")
       |> json(%{
         access_token: access_token,
         token_type: @token_type,

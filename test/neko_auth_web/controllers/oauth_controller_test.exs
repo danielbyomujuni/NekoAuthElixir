@@ -2,6 +2,7 @@ defmodule NekoAuthWeb.OAuthControllerTest do
   use NekoAuthWeb.ConnCase, async: true
 
   import Phoenix.ConnTest
+  alias NekoAuth.Domains.UserDomain
   alias NekoAuth.User.UserManager
   alias NekoAuth.Users.User
 
@@ -66,13 +67,13 @@ defmodule NekoAuthWeb.OAuthControllerTest do
         date_of_birth: Date.from_iso8601!("2000-01-01")
       })
 
-      user = NekoAuth.Repo.get(User, "user_auth@example.com")
+      {:ok, user} = UserDomain.get_user_by_email("user_auth@example.com")
       #IO.inspect(user, label: "User for testing")
       {:ok, conn: build_conn(), user: user}
     end
 
     test "returns tokens for valid authorization_code", %{conn: conn, user: user} do
-      code = UserManager.generate_auth_code(user)
+      code = UserManager.generate_auth_code(user, %AuthorizeDomain{})
 
       conn =
         conn
@@ -97,7 +98,7 @@ defmodule NekoAuthWeb.OAuthControllerTest do
       assert json_response(conn, 400)["error"] == "invalid_request"
     end
 
-    test "returns error for missing code in authorization_code grant", %{conn: conn} do
+    test "returns{:ok, error for missing code in authorization_code grant", %{conn: conn} do
       conn =
         conn
         |> post("/api/v1/oauth/token", %{"grant_type" => "authorization_code"})

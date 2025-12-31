@@ -1,4 +1,5 @@
 defmodule NekoAuth.User.UserManagerTest do
+alias NekoAuth.Domains.UserDomain
   use NekoAuth.DataCase, async: true
 
   alias NekoAuth.Users.User
@@ -17,7 +18,7 @@ defmodule NekoAuth.User.UserManagerTest do
     }
 
   {:ok, _} = UserManager.register_new_user(reg)
-  user = Repo.get(User,"user_manager_test@example.com")
+  {:ok, user} = UserDomain.get_user_by_email(reg.email)
 
     %{user: user}
   end
@@ -82,8 +83,8 @@ defmodule NekoAuth.User.UserManagerTest do
 
   describe "authorization code flow" do
     test "encodes and decodes user", %{user: user} do
-      code = UserManager.generate_auth_code(user)
-      assert {:ok, ^user} = UserManager.user_from_auth_code(code)
+      code = UserManager.generate_auth_code(user, %AuthorizeDomain{} )
+      assert {:ok, ^user} = UserManager.user_from_auth_code(code, nil)
     end
   end
 end
