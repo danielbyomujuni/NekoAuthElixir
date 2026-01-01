@@ -4,8 +4,9 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { resolve } from "node:path";
 import tailwindcss from '@tailwindcss/vite'
 
-export default defineConfig({
-  base: "https://auth.nekosyndicate.com",
+export default defineConfig(({ mode }) => {
+  return ({
+  base: mode === "production" ? "https://auth.nekosyndicate.com" : "http://localhost:4050",
   plugins: [TanStackRouterVite({ autoCodeSplitting: false }), viteReact(),
     tailwindcss()
   ], // Disable code splitting
@@ -45,4 +46,4 @@ export default defineConfig({
     sourcemap: false,
     manifest: false, // Disable manifest for simpler setup
   },
-});
+})});

@@ -54,6 +54,7 @@ defmodule NekoAuth.MixProject do
       {:gettext, "~> 0.26"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:cors_plug, "~> 3.0"},
 
       # App libs
       {:absinthe, "~> 1.7"},
@@ -85,10 +86,10 @@ defmodule NekoAuth.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       coverage: ["test --cover"],
-      "assets.install": ["cmd cd assets && yarn install"],
-      "assets.tsc": ["cmd cd assets && yarn run tsc"],
-      "assets.test": ["cmd cd assets && yarn run test"],
-      "assets.coverage": ["cmd cd assets && yarn run test"],
+      "assets.install": ["cmd --cd assets yarn install"],
+      "assets.tsc": ["cmd --cd assets yarn run tsc"],
+      "assets.test": ["cmd --cd assets yarn run test"],
+      "assets.coverage": ["cmd --cd assets yarn run test"],
       run: ["phx.server"],
       "assets.deploy": ["cmd --cd assets yarn run build", "phx.digest"],
     ]

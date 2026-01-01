@@ -19,7 +19,7 @@ export default function create_client() {
   })
 
   const httpLink = new HttpLink({
-    uri: `${import.meta.env.BASE_URL}api/graphql`,
+    uri: new URL('/api/graphql', import.meta.env.BASE_URL).href,
     credentials: "include" // keep this if backend needs cookies for other reasons
   })
 

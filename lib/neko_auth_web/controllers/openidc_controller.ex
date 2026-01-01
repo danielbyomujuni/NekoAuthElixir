@@ -1,7 +1,7 @@
 defmodule NekoAuthWeb.OpenidcController do
   use Phoenix.Controller, formats: [:json]
 
-  def jwks(conn, %{} = query_params) do
+  def jwks(conn, %{} = _query_params) do
     # Read the public key file
     public_key_path = Path.join(:code.priv_dir(:neko_auth), "keys/public_key.pem")
     pem_content = File.read!(public_key_path)
@@ -33,7 +33,7 @@ defmodule NekoAuthWeb.OpenidcController do
     |> json(jwks)
   end
 
-  def config(conn, %{} = query_params) do
+  def config(conn, %{} = _query_params) do
     host_name = System.get_env("HOST_NAME")
 
     config = %{

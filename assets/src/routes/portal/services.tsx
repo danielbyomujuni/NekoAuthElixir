@@ -249,7 +249,7 @@ export default function ServicesPortal() {
                 secret after creation.
               </DialogDescription>
             </DialogHeader>
-            <Alert className="mx-6 mt-4">
+            <Alert className="mt-4 mx-auto">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 <strong>Note:</strong> After creating your service, you'll need to generate a client secret. The secret

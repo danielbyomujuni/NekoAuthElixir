@@ -34,7 +34,7 @@ defp validate_email(email) do
          min_length: 5,
          max_length: 65,
          nullable: false,
-         regex: ~s/^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/
+         regex: "^[\\w\\-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
        ) do
     true -> {:ok, :email}
     false -> {:error, :email}
@@ -145,7 +145,11 @@ end
   """
   def get_user_by_email(email) do
     user =
-      Repo.get(User, email)
+      from(
+        u in User,
+        where: u.email == ^email
+      )
+      |> Repo.one()
 
     case user do
       nil -> Result.err("User not found")

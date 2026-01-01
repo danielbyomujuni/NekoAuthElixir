@@ -39,7 +39,7 @@ defmodule NekoAuthWeb.UserController do
       }
 
       # IO.inspect(email)
-      IO.inspect(registration)
+      #IO.inspect(registration)
 
       case UserManager.register_new_user(registration) do
         {:ok, _user} ->
@@ -72,7 +72,7 @@ defmodule NekoAuthWeb.UserController do
   def generate_redirect_uri(base_url, path, query_params \\ []) do
     uri = URI.merge(base_url, path)
     query = URI.encode_query(query_params)
-    uri_with_query = %URI{uri | query: query}
+    uri_with_query = %{uri | query: query}
     URI.to_string(uri_with_query)
   end
 
@@ -105,7 +105,7 @@ defmodule NekoAuthWeb.UserController do
           generate_redirect_uri(
             authorize_domain.redirect_uri,
             "",
-            code: user_manager().generate_auth_code(user),
+            code: user_manager().generate_auth_code(user, authorize_domain),
             state: authorize_domain.state
           )
 
@@ -153,7 +153,7 @@ defmodule NekoAuthWeb.UserController do
     data_url
   end
 
-  def user(conn, %{} = query_params) do
+  def user(conn, %{} = _query_params) do
     with {:ok, token} <- extract_bearer_token(conn),
          {:ok, user} <- UserManager.user_from_access_token(token) do
 

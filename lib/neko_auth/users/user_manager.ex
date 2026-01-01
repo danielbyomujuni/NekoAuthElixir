@@ -4,19 +4,21 @@ defmodule NekoAuth.User.UserManager do
   """
   @behaviour NekoAuth.UserManagerBehavior
 
+  import Ecto.Query
+
   alias NekoAuth.Users.User
   alias NekoAuth.Domains.UserDomain
   alias NekoAuth.Repo
   alias Result
   alias RegistrationStruct
   alias Base
+  alias NekoAuth.Users.Sessions
 
   # 15 minutes
   @access_token_ttl 15 * 60
   # 1 day
   @refresh_token_ttl 30 * 60 * 60 * 24
-  # 1 minute
-  @auth_code_ttl 1 * 60
+
   @issuer "https://auth.nekosyndicate.com"
 
   @spec register_new_user(%RegistrationStruct{
@@ -98,7 +100,7 @@ defmodule NekoAuth.User.UserManager do
     with {true, jwt, _} <- JOSE.JWT.verify(key, {%{alg: :jose_jws_alg_rsa_pkcs1_v1_5}, token}),
         {%{}, %{"sub" => email, "exp" => exp}} <- JOSE.JWT.to_map(jwt),
          true <- current_time() < exp,
-         user when not is_nil(user) <- Repo.get(User, email) do
+         {:ok, user} <- UserDomain.get_user_by_email(email) do
         {:ok, user}
     else
       _ -> {:error, :invalid_token}
@@ -124,7 +126,7 @@ defmodule NekoAuth.User.UserManager do
     with {true, jwt, _} <- JOSE.JWT.verify(key, {%{alg: :jose_jws_alg_rsa_pkcs1_v1_5}, token}),
         {%{}, %{"sub" => email, "exp" => exp}} <- JOSE.JWT.to_map(jwt),
          true <- current_time() < exp,
-         user when not is_nil(user) <- Repo.get(User, email) do
+         {:ok, user} <- UserDomain.get_user_by_email(email) do
         {:ok, user}
     else
       _ -> {:error, :invalid_token}
@@ -151,38 +153,56 @@ defmodule NekoAuth.User.UserManager do
     JOSE.JWT.sign(signer(), %{"alg" => "RS256"}, claims) |> JOSE.JWS.compact() |> elem(1)
   end
 
-  def generate_auth_code(%User{} = user) do
-    key =
-      signer()
-      |> JOSE.JWK.to_public()
+  def generate_auth_code(%User{} = user, %AuthorizeDomain{} = auth_domain) do
+    code = :crypto.strong_rand_bytes(16)
+      |> Base.url_encode64(padding: false)
+    %Sessions{}
+    |> Sessions.changeset(%{
+        user_id: user.id,
+        code: code,
+        code_challenge: auth_domain.code_challenge,
+        code_method: auth_domain.code_challenge_method
+      })
+      |> Repo.insert!()
 
-    # IO.inspect(key)
-
-    {_, compact_token} =
-      %{
-        account: user.email,
-        exp: current_time() + @auth_code_ttl
-      }
-      |> Jason.encode!()
-      |> Base.encode64()
-      |> JOSE.JWK.block_encrypt(key)
-      |> JOSE.JWE.compact()
-
-      compact_token
+    code
   end
 
-  def user_from_auth_code(code) do
-    #IO.puts("Code: #{code}")
-    signer = signer()
+  def user_from_auth_code(code, code_verifier) do
+      from(
+      s in Sessions,
+      where: s.code == ^code,
+      join: u in User,
+      on: s.user_id == u.id,
+      preload: [user: u]
+      )
+    |> Repo.one()
+    |> case do
+      %{id: id, code_used_at: nil, code_method: "S256", code_challenge: code_challenge, user: user} ->
+        hashed_code = :crypto.hash(:sha256, code_verifier) |> Base.url_encode64(padding: false)
+        if hashed_code == code_challenge do
+          from(s in Sessions, where: s.id == ^id, update: [set: [code_used_at: ^DateTime.utc_now()]])
+          |> Repo.update_all([])
 
-    with  {plain_text, _} <- JOSE.JWK.block_decrypt(code, signer),
-          {:ok, decoded_json} <- Base.decode64(plain_text),
-          {:ok, %{"account" => email, "exp" => exp}} <- Jason.decode(decoded_json),
-            true <- current_time() < exp,
-            user when not is_nil(user) <- Repo.get(User, email) do
-              {:ok, user}
-    else
-      _ -> {:error, :decryption_failed}
+          {:ok, user}
+        else
+          {:error, :challenge_failed}
+        end
+      %{id: id, code_used_at: nil, code_method: "plain", code_challenge: code_challenge, user: user} ->
+        if code_verifier == code_challenge do
+          from(s in Sessions, where: s.id == ^id, update: [set: [code_used_at: ^DateTime.utc_now()]])
+          |> Repo.update_all([])
+
+          {:ok, user}
+        else
+          {:error, :challenge_failed}
+        end
+      %{id: id, code_used_at: nil, code_method: nil, user: user} ->
+        from(s in Sessions, where: s.id == ^id, update: [set: [code_used_at: ^DateTime.utc_now()]])
+          |> Repo.update_all([])
+
+        {:ok, user}
+      _ -> {:error, :invalid_session}
     end
   end
 

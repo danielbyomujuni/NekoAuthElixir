@@ -1,4 +1,5 @@
 defmodule NekoAuth.UsersTest do
+alias NekoAuth.Domains.UserDomain
   use NekoAuth.DataCase, async: true
 
   alias NekoAuth.Users
@@ -29,13 +30,11 @@ defmodule NekoAuth.UsersTest do
   describe "get_user!/1" do
     test "returns the user by email" do
       user = create_user_fixture()
-      assert Users.get_user!(user.email) == user
+      assert UserDomain.get_user_by_email(user.email) == {:ok, user}
     end
 
     test "raises if user not found" do
-      assert_raise Ecto.NoResultsError, fn ->
-        Users.get_user!("nonexistent@example.com")
-      end
+      assert {:error, _} = UserDomain.get_user_by_email("nonexistent@example.com")
     end
   end
 
@@ -69,7 +68,7 @@ defmodule NekoAuth.UsersTest do
     test "deletes the user" do
       user = create_user_fixture()
       assert {:ok, _} = Users.delete_user(user)
-      assert_raise Ecto.NoResultsError, fn -> Users.get_user!(user.email) end
+      assert {:error, _ } = UserDomain.get_user_by_email(user.email)
     end
   end
 

@@ -9,13 +9,13 @@ export const Route = createFileRoute('/_authentication')({
 export default function AuthenticationLayout() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="absolute top-6 lg:top-32 left-32 right-32 lg:bottom-40">
+      <div className="absolute lg:top-32 sm:left-32 sm:right-32 lg:bottom-40 my-auto">
         <Card className="flex flex-col lg:flex-row p-0 justify-between rounded-3xl overflow-clip h-full">
           <CardHeader className="bg-[url(/images/bg.png)] bg-cover bg-bottom lg:w-5/12 xl:w-5/12 flex flex-col justify-center items-center pt-4">
             <CardTitle className="text-5xl flex flex-col gap-4 2xl:text-7xl">
               <img
-                className="w-24 2xl:w-80 h-24 2xl:h-80 rounded-full mx-auto"
-                src="http://cdn.nekosyndicate.com/assets/NekoSyndicate/logo-v1.png"
+                className="w-24 2xl:w-40 h-24 2xl:h-40 rounded-full mx-auto"
+                src="https://media.istockphoto.com/id/1214084790/vector/black-cat-circle-symbol.jpg?s=612x612&w=0&k=20&c=7mafIEvOw7_Nf01hA4pHGzZIexKcI3HTcHqz0OQrt0s="
                 alt="Neko Logo"
               />
             </CardTitle>

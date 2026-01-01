@@ -63,12 +63,15 @@ defmodule NekoAuthWeb.OAuthController do
   defp route_grant_type(conn, %{"grant_type" => "refresh_token"} = params),
     do: handle_refresh_token_grant(conn, params)
 
-  defp handle_authorization_code_grant(conn, %{"code" => code} = _params) do
-    with {:ok, user} <- UserManager.user_from_auth_code(code),
+  defp handle_authorization_code_grant(conn, %{"code" => code, "code_verifier" => code_verifier} = _params) do
+    with {:ok, user} <- UserManager.user_from_auth_code(code, code_verifier),
          access_token <- UserManager.create_access_token(user),
          id_token <- UserManager.create_id_token(user, nil),
          refresh_token <- UserManager.create_refresh_token(user) do
-      json(conn, %{
+
+      conn
+      |> put_resp_header("access-control-allow-origin", "*")
+      |> json(%{
         access_token: access_token,
         token_type: @token_type,
         expires_in: @expires_in,
@@ -78,6 +81,10 @@ defmodule NekoAuthWeb.OAuthController do
     else
       {:error, response } -> error_response(conn, "[T104] #{response}")
     end
+  end
+
+  defp handle_authorization_code_grant(conn, %{"code" => code} = _params) do
+    handle_authorization_code_grant(conn, %{"code" => code, "code_verifier" => nil})
   end
 
   defp handle_authorization_code_grant(conn, _params) do
