@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import { createService, deleteService, generateNewServiceSecret, getServices, type OAuthService } from "@/lib/graph/services"
 import { createFileRoute } from "@tanstack/react-router"
+import { toast } from "sonner"
 
 const availableScopes = [
   { id: "read", label: "Read", description: "Read access to user data" },
@@ -523,16 +524,16 @@ export default function ServicesPortal() {
       </Dialog>
 
       {newlyGeneratedSecret && (
-        <Alert className="border-amber-200 bg-amber-50">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-800">
+        <Alert className="border-yellow-800 bg-yellow-600">
+          <AlertTriangle className="h-4 w-4 text-yellow-200 my-auto" />
+          <AlertDescription className="text-yellow-300">
             <div className="flex items-center justify-between">
               <div>
                 <strong>Important:</strong> Copy your client secret now. You won{"'"}t be able to see it again for
                 security reasons.
               </div>
               <div className="flex items-center gap-2 ml-4">
-                <code className="bg-amber-100 px-2 py-1 rounded text-sm font-mono">{newlyGeneratedSecret.secret}</code>
+                <code className="bg-yellow-100 text-yellow-500 px-2 py-1 rounded text-sm font-mono">{newlyGeneratedSecret.secret}</code>
                 <Button
                   variant="outline"
                   size="sm"
@@ -586,7 +587,10 @@ export default function ServicesPortal() {
                           <code className="text-sm bg-muted px-2 py-1 rounded flex-1 break-all">
                             {service.id}
                           </code>
-                          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(service.id)}>
+                          <Button variant="ghost" size="sm" onClick={() => {
+                            copyToClipboard(service.id);
+                            toast("Client ID has been copied to the clipboard")
+                          }}>
                             <Copy className="h-3 w-3" />
                           </Button>
                         </div>
@@ -612,7 +616,10 @@ export default function ServicesPortal() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => copyToClipboard(service.clientSecret!)}
+                                  onClick={() => {
+                                    copyToClipboard(service.clientSecret!)
+                                    toast("Client Secret has been copied to the clipboard")
+                                  }}
                                 >
                                   <Copy className="h-3 w-3" />
                                 </Button>
