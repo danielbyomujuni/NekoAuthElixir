@@ -47,12 +47,6 @@ defmodule NekoAuthWeb.Router do
     get "/register", PageController, :register
   end
 
-  scope "/portal", NekoAuthWeb do
-    pipe_through [:browser, :authorize]
-    get "/", PageController, :home
-    get "/services", PageController, :home
-  end
-
   scope "/.well-known", NekoAuthWeb do
     pipe_through :api
     get "/jwks.json", OpenidcController, :jwks
@@ -70,6 +64,12 @@ defmodule NekoAuthWeb.Router do
     post "/register", UserController, :register
     post "/login", UserController, :login
     get "/avatars/:user_name/:descriminator", UserController, :avatar
+  end
+
+    scope "/portal", NekoAuthWeb do
+    pipe_through [:browser, :authorize]
+    get "/", PageController, :home
+    get "/*path", PageController, :home
   end
 
 
